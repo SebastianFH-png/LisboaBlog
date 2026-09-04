@@ -29,3 +29,17 @@
 article h1 {
   letter-spacing: -0.02em;
 }
+
+.hero-banner {
+  min-height: 22rem;
+}
+.hero-banner-img {
+  animation: hero-kenburns 24s ease-in-out infinite alternate;
+}
+@keyframes hero-kenburns {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-banner-img { animation: none; }
+}

@@ -1,10 +1,21 @@
 {{ $posts := (where site.RegularPages "Section" "posts").ByDate.Reverse }}
+{{ $heroSrc := resources.Get "images/hero-lisboa.jpg" }}
+{{ $hero := "" }}
+{{ if $heroSrc }}
+  {{ $hero = $heroSrc.Resize "1920x webp q80" }}
+{{ end }}
 
-<header class="fade-in-up mb-16 rounded-2xl bg-gradient-to-br from-primary-500 to-secondary-600 px-8 py-14 text-center text-white shadow-lg sm:py-20">
-  <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl">{{ site.Title | emojify }}</h1>
-  {{ with site.Params.author.headline }}
-    <p class="mx-auto mt-4 max-w-xl text-lg text-white/90">{{ . | emojify }}</p>
+<header class="fade-in-up hero-banner relative mb-16 overflow-hidden rounded-2xl text-center text-white shadow-lg">
+  {{ with $hero }}
+    <img src="{{ .RelPermalink }}" alt="" class="hero-banner-img absolute inset-0 h-full w-full object-cover" loading="eager">
   {{ end }}
+  <div class="absolute inset-0 bg-gradient-to-t from-neutral-900/85 via-neutral-900/35 to-primary-900/20"></div>
+  <div class="relative px-8 py-24 sm:py-36">
+    <h1 class="text-4xl font-extrabold tracking-tight drop-shadow-sm sm:text-6xl">{{ site.Title | emojify }}</h1>
+    {{ with site.Params.author.headline }}
+      <p class="mx-auto mt-4 max-w-xl text-lg text-white/90 drop-shadow-sm">{{ . | emojify }}</p>
+    {{ end }}
+  </div>
 </header>
 
 <div class="flex flex-col gap-16">
