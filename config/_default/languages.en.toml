@@ -1,0 +1,19 @@
+locale = "en-US"
+label = "English"
+direction = "ltr"
+weight = 1
+
+title = "Sebastian in Lissabon"
+copyright = "&copy; 2026 Sebastian"
+
+[params]
+  dateFormat = "2 January 2006"
+
+  mainSections = ["posts"]
+  description = "Erasmus exchange semester blog, Lisbon."
+
+[params.author]
+  name = "Sebastian"
+  headline = "Erasmus semester in Lisbon"
+  bio = "Studying abroad in Lisbon, sharing trips, photos and stories here. Edit this bio in config/_default/languages.en.toml."
+  links = []

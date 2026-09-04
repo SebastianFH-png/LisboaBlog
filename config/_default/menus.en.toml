@@ -1,0 +1,27 @@
+# -- Main Menu --
+
+[[main]]
+  name = "Home"
+  pageRef = "/"
+  weight = 10
+
+[[main]]
+  name = "Posts"
+  pageRef = "posts"
+  weight = 20
+
+[[main]]
+  name = "Map"
+  pageRef = "map"
+  weight = 30
+
+[[main]]
+  name = "Tags"
+  pageRef = "tags"
+  weight = 40
+
+[[main]]
+  identifier = "search"
+  weight = 90
+  [main.params]
+    action = "search"

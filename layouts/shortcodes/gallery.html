@@ -1,0 +1,18 @@
+{{ $images := .Page.Resources.ByType "image" }}
+{{ if gt (len $images) 0 }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.3.1/css/glightbox.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.3.1/js/glightbox.min.js"></script>
+
+<div class="my-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+  {{ range $images }}
+  {{ $thumb := .Resize "500x webp q75" }}
+  <a href="{{ .RelPermalink }}" class="glightbox block overflow-hidden rounded-lg" data-gallery="page-gallery">
+    <img src="{{ $thumb.RelPermalink }}" loading="lazy" class="h-full w-full object-cover transition duration-300 hover:scale-105" alt="{{ .Params.alt | default "" }}">
+  </a>
+  {{ end }}
+</div>
+
+<script>
+  if (window.GLightbox) { GLightbox({ selector: '.glightbox' }); }
+</script>
+{{ end }}
