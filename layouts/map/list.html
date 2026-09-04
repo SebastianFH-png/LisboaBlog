@@ -5,10 +5,48 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.3.1/css/glightbox.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.3.1/js/glightbox.min.js"></script>
 
   <div id="travel-map" class="my-6 h-[32rem] w-full rounded-lg overflow-hidden"></div>
 
-  {{ $posts := where site.RegularPages "Type" "posts" }}
+  {{ $posts := where site.RegularPages "Section" "posts" }}
+
+  {{/* One entry per photo that carries GPS EXIF data, grouped client-side by rounded coordinate */}}
+  {{ $photoPins := slice }}
+  {{ range $posts }}
+    {{ $post := . }}
+    {{ range $post.Resources.ByType "image" }}
+      {{ $exif := .Exif }}
+      {{ if and $exif (ne $exif.Lat 0.0) (ne $exif.Long 0.0) }}
+        {{ $thumb := .Fill "160x160 webp q70 Center" }}
+        {{ $full := .Resize "1600x webp q80" }}
+        {{ $photoPins = $photoPins | append (dict
+          "lat" $exif.Lat
+          "lon" $exif.Long
+          "thumb" $thumb.RelPermalink
+          "full" $full.RelPermalink
+          "postURL" $post.RelPermalink
+          "postTitle" $post.Title
+        ) }}
+      {{ end }}
+    {{ end }}
+  {{ end }}
+
+  {{/* Fallback: posts with a manual lat/lon but no GPS-tagged photos */}}
+  {{ $postPins := slice }}
+  {{ range $posts }}
+    {{ if and .Params.lat .Params.lon }}
+      {{ $postPins = $postPins | append (dict
+        "lat" .Params.lat
+        "lon" .Params.lon
+        "postURL" .RelPermalink
+        "postTitle" .Title
+        "location" (.Params.location | default "")
+      ) }}
+    {{ end }}
+  {{ end }}
+
   <script>
   (function () {
     var map = L.map('travel-map').setView([38.7223, -9.1393], 6);
@@ -16,16 +54,51 @@
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    var pins = [
-      {{ range $posts }}
-      {{ if and .Params.lat .Params.lon }}
-      { lat: {{ .Params.lat }}, lon: {{ .Params.lon }}, title: {{ .Title | jsonify }}, url: {{ .RelPermalink | jsonify }}, location: {{ .Params.location | default "" | jsonify }} },
-      {{ end }}
-      {{ end }}
-    ];
+    var photoPins = {{ $photoPins | jsonify | safeJS }};
+    var postPins = {{ $postPins | jsonify | safeJS }};
 
-    pins.forEach(function (p) {
-      var popup = '<a href="' + p.url + '"><strong>' + p.title + '</strong></a>' + (p.location ? '<br>' + p.location : '');
+    // Group photos taken close together (~11m, 4 decimal places) into one pin
+    var groups = {};
+    photoPins.forEach(function (p) {
+      var key = p.lat.toFixed(4) + ',' + p.lon.toFixed(4);
+      if (!groups[key]) {
+        groups[key] = { lat: p.lat, lon: p.lon, photos: [], postURLs: {} };
+      }
+      groups[key].photos.push(p);
+      groups[key].postURLs[p.postURL] = true;
+    });
+
+    Object.keys(groups).forEach(function (key) {
+      var group = groups[key];
+      var cover = group.photos[0];
+      var count = group.photos.length;
+      var html =
+        '<div class="photo-pin">' +
+          '<img src="' + cover.thumb + '" alt="">' +
+          (count > 1 ? '<span class="photo-pin-count">' + count + '</span>' : '') +
+        '</div>';
+      var icon = L.divIcon({ html: html, className: 'photo-pin-wrapper', iconSize: [52, 52] });
+
+      L.marker([group.lat, group.lon], { icon: icon }).addTo(map).on('click', function () {
+        var lightbox = GLightbox({
+          elements: group.photos.map(function (p) {
+            return {
+              href: p.full,
+              type: 'image',
+              description: '<a href="' + p.postURL + '">' + p.postTitle + '</a>'
+            };
+          }),
+          descPosition: 'bottom'
+        });
+        lightbox.open();
+      });
+    });
+
+    // Fallback pins for posts without any GPS-tagged photos
+    postPins.forEach(function (p) {
+      var alreadyShown = photoPins.some(function (photo) { return photo.postURL === p.postURL; });
+      if (alreadyShown) return;
+      var popup = '<a href="' + p.postURL + '"><strong>' + p.postTitle + '</strong></a>' + (p.location ? '<br>' + p.location : '');
       L.marker([p.lat, p.lon]).addTo(map).bindPopup(popup);
     });
   })();

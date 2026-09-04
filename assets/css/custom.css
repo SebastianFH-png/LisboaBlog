@@ -43,3 +43,44 @@ article h1 {
 @media (prefers-reduced-motion: reduce) {
   .hero-banner-img { animation: none; }
 }
+
+.photo-pin-wrapper {
+  background: transparent;
+  border: none;
+}
+.photo-pin {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 9999px;
+  overflow: visible;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.photo-pin:hover {
+  transform: scale(1.08);
+}
+.photo-pin img {
+  display: block;
+  width: 48px;
+  height: 48px;
+  border-radius: 9999px;
+  object-fit: cover;
+  border: 3px solid white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+.photo-pin-count {
+  position: absolute;
+  bottom: -4px;
+  right: -6px;
+  min-width: 18px;
+  padding: 1px 5px;
+  border-radius: 9999px;
+  background: rgba(var(--color-primary-600), 1);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  border: 2px solid white;
+}

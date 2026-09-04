@@ -9,11 +9,6 @@ lon: 0.0
 location: ""
 ---
 
-Hier schreiben. Fotos einfach in diesen Ordner legen (alle .jpg/.png-Dateien
-neben dieser index.md), dann als Galerie anzeigen mit:
+TODO
 
-{{</* gallery */>}}
-
-Oder ein einzelnes Foto direkt einbinden:
-
-![Alt-Text](photo1.jpg)
+{{</* slideshow */>}}
