@@ -82,13 +82,8 @@
       L.marker([group.lat, group.lon], { icon: icon }).addTo(map).on('click', function () {
         var lightbox = GLightbox({
           elements: group.photos.map(function (p) {
-            return {
-              href: p.full,
-              type: 'image',
-              description: '<a href="' + p.postURL + '">' + p.postTitle + '</a>'
-            };
-          }),
-          descPosition: 'bottom'
+            return { href: p.full, type: 'image' };
+          })
         });
         lightbox.open();
       });
