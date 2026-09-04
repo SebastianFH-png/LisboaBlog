@@ -2,7 +2,7 @@
 # Refer to theme docs for details.
 # https://jpanther.github.io/congo/docs/configuration/#theme-parameters
 
-colorScheme = "congo"
+colorScheme = "lisboa"
 defaultAppearance = "light" # valid options: light or dark
 autoSwitchAppearance = true
 
@@ -25,7 +25,7 @@ fingerprintAlgorithm = "sha256"
   showScrollToTop = true
 
 [homepage]
-  layout = "profile" # valid options: page, profile, custom
+  layout = "custom" # full posts feed, see layouts/_partials/home/custom.html
   showRecent = true
   recentLimit = 10
 

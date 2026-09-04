@@ -1,0 +1,19 @@
+locale = "de-DE"
+label = "Deutsch"
+direction = "ltr"
+weight = 1
+
+title = "Sebastian in Lissabon"
+copyright = "&copy; 2026 Sebastian"
+
+[params]
+  dateFormat = "2. January 2006"
+
+  mainSections = ["posts"]
+  description = "Erasmus-Auslandssemester-Blog aus Lissabon."
+
+[params.author]
+  name = "Sebastian"
+  headline = "Erasmus-Semester in Lissabon"
+  bio = "Auslandssemester in Lissabon, hier teile ich Ausflüge, Fotos und Geschichten. Bio anpassen in config/_default/languages.de.toml."
+  links = []

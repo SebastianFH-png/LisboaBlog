@@ -1,0 +1,40 @@
+/* Lisboa scheme: warm terracotta (rooftops) + azulejo blue (tiles) */
+:root {
+  --color-neutral: 255, 253, 250;
+  /* Warm stone */
+  --color-neutral-50: 250, 248, 245;
+  --color-neutral-100: 245, 240, 233;
+  --color-neutral-200: 232, 223, 211;
+  --color-neutral-300: 214, 200, 182;
+  --color-neutral-400: 168, 152, 133;
+  --color-neutral-500: 120, 106, 90;
+  --color-neutral-600: 87, 76, 64;
+  --color-neutral-700: 64, 55, 46;
+  --color-neutral-800: 42, 35, 29;
+  --color-neutral-900: 26, 21, 17;
+  --color-neutral-950: 14, 11, 9;
+  /* Terracotta (primary) */
+  --color-primary-50: 253, 242, 235;
+  --color-primary-100: 250, 226, 210;
+  --color-primary-200: 246, 199, 166;
+  --color-primary-300: 240, 164, 111;
+  --color-primary-400: 232, 122, 65;
+  --color-primary-500: 216, 90, 47;
+  --color-primary-600: 186, 68, 34;
+  --color-primary-700: 152, 53, 28;
+  --color-primary-800: 118, 43, 26;
+  --color-primary-900: 92, 36, 24;
+  --color-primary-950: 51, 18, 12;
+  /* Azulejo blue (secondary) */
+  --color-secondary-50: 235, 248, 250;
+  --color-secondary-100: 210, 238, 244;
+  --color-secondary-200: 168, 220, 233;
+  --color-secondary-300: 112, 195, 216;
+  --color-secondary-400: 61, 163, 191;
+  --color-secondary-500: 31, 128, 158;
+  --color-secondary-600: 21, 100, 128;
+  --color-secondary-700: 20, 79, 102;
+  --color-secondary-800: 21, 63, 82;
+  --color-secondary-900: 20, 50, 66;
+  --color-secondary-950: 11, 30, 41;
+}

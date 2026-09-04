@@ -4,7 +4,7 @@
 
 theme = "congo"
 baseURL = "https://sebastianfh-png.github.io/LisboaBlog/"
-defaultContentLanguage = "en"
+defaultContentLanguage = "de"
 
 enableRobotsTXT = true
 summaryLength = 0

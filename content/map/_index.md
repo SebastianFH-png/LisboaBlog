@@ -1,5 +1,5 @@
 ---
-title: "Travel Map"
+title: "Reisekarte"
 ---
 
-All the places visited this semester. Click a pin to jump to the post.
+Alle Orte, die dieses Semester besucht wurden. Auf eine Nadel klicken, um zum Beitrag zu springen.

@@ -33,6 +33,15 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install CSS build deps
+        run: npm ci
+      - name: Build Tailwind CSS
+        run: npm run build:css
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5

@@ -1,24 +1,19 @@
-# -- Main Menu --
+# -- Hauptmenü --
 
 [[main]]
-  name = "Home"
+  name = "Start"
   pageRef = "/"
   weight = 10
 
 [[main]]
-  name = "Posts"
+  name = "Beiträge"
   pageRef = "posts"
   weight = 20
 
 [[main]]
-  name = "Map"
+  name = "Karte"
   pageRef = "map"
   weight = 30
-
-[[main]]
-  name = "Tags"
-  pageRef = "tags"
-  weight = 40
 
 [[main]]
   identifier = "search"
