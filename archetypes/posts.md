@@ -11,4 +11,4 @@ location: ""
 
 TODO
 
-{{</* slideshow */>}}
+{{< slideshow >}}
