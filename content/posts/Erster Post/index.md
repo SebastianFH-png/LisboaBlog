@@ -11,4 +11,3 @@ location: ""
 
 Hallo an alle, das hier ist ein Blog den ich erstelle und versuche regelmäßig zu updaten, damit ihr, Freunde, Familie und alle die es interessiert ein bissl verfolgen könnt, was ich hier auf meinem Auslandssemester in Lissabon so erlebe.
 
-{{</* slideshow */>}}
