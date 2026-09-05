@@ -15,7 +15,7 @@
     {{ end }}
     <a
       href="{{ $full.RelPermalink }}"
-      class="glightbox-slideshow group relative h-full max-w-[92%] flex-none snap-center overflow-hidden rounded-2xl border-2 border-primary-200 shadow-md dark:border-primary-800 sm:max-w-[80%]"
+      class="{{ $id }}-glightbox group relative h-full max-w-[92%] flex-none snap-center overflow-hidden rounded-2xl border-2 border-primary-200 shadow-md dark:border-primary-800 sm:max-w-[80%]"
       data-gallery="{{ $id }}"
     >
       <img
@@ -100,7 +100,7 @@
   }
 
   setActive(0);
-  if (window.GLightbox) { GLightbox({ selector: ".glightbox-slideshow" }); }
+  if (window.GLightbox) { GLightbox({ selector: ".{{ $id }}-glightbox" }); }
 })();
 </script>
 
