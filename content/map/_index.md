@@ -2,4 +2,4 @@
 title: "Reisekarte"
 ---
 
-Alle Orte, die dieses Semester besucht wurden. Auf eine Nadel klicken, um zum Beitrag zu springen.
+Hier findet ihr eine Karte, auf der ihr sehen könnt, wo die jeweiligen Fotos aufgenommen wurden.
