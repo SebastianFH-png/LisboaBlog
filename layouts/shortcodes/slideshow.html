@@ -9,8 +9,12 @@
   <div class="slideshow-track flex h-72 snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth rounded-2xl pb-2 sm:h-96">
     {{ range $i, $img := $images }}
     {{ $slide := $img.Resize "x800 webp q75" }}
+    {{ $full := $img.Resize "2000x webp q80" }}
+    {{ if gt $img.Height $img.Width }}
+      {{ $full = $img.Resize "x2000 webp q80" }}
+    {{ end }}
     <a
-      href="{{ $img.RelPermalink }}"
+      href="{{ $full.RelPermalink }}"
       class="glightbox-slideshow group relative h-full max-w-[92%] flex-none snap-center overflow-hidden rounded-2xl border-2 border-primary-200 shadow-md dark:border-primary-800 sm:max-w-[80%]"
       data-gallery="{{ $id }}"
     >
