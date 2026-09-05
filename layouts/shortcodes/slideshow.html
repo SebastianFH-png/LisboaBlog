@@ -6,18 +6,18 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.3.1/js/glightbox.min.js"></script>
 
 <div id="{{ $id }}" class="not-prose relative my-8">
-  <div class="slideshow-track flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth rounded-2xl pb-2">
+  <div class="slideshow-track flex h-72 snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth rounded-2xl pb-2 sm:h-96">
     {{ range $i, $img := $images }}
-    {{ $slide := $img.Resize "1400x webp q75" }}
+    {{ $slide := $img.Resize "x800 webp q75" }}
     <a
       href="{{ $img.RelPermalink }}"
-      class="glightbox-slideshow group relative aspect-[3/2] w-[85%] flex-none snap-center overflow-hidden rounded-2xl border-2 border-primary-200 shadow-md dark:border-primary-800 sm:w-[70%] md:w-[60%]"
+      class="glightbox-slideshow group relative h-full max-w-[92%] flex-none snap-center overflow-hidden rounded-2xl border-2 border-primary-200 shadow-md dark:border-primary-800 sm:max-w-[80%]"
       data-gallery="{{ $id }}"
     >
       <img
         src="{{ $slide.RelPermalink }}"
         loading="lazy"
-        class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+        class="h-full w-auto object-contain transition duration-500 group-hover:scale-105"
         alt="{{ $img.Params.alt | default "" }}"
       >
       <span class="absolute bottom-3 end-3 rounded-full bg-neutral-900/60 px-2 py-1 text-xs font-semibold text-white">
