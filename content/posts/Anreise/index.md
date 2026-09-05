@@ -9,6 +9,6 @@ lon: 0.0
 location: ""
 ---
 
-Die Reise hat am Flughafen Schwechat begonnen. Nachdem ich noch einen gemütlichen Kaffee mit meiner Familie genossen habe und mich verabschiedet habe, sind auch schon die ersten lustigen Ereignisse passiert. Am Weg zum Gate hab ich einen Studienkollegen aus meiner FH getroffen, der gerade aus dem Urlaub zurückgekommen ist. Beim Gate die zweite Überraschung: Bibiza, ein bekannter Musiker aus Wien, sitzt am Gate und wartet auf die gleiche RyanAir Maschine nach Lissabon.Nach einem kurzen Fanmoment inklusive Foto ging es dann aber wirklich nach los. Dort angekommen, waren die Mitbewohner erstmal eine Überraschung. Anders als erwartet, habe ich auf einen ca. 40 jährigen Pakistani getroffen, der aber eigentlich ganz nett ist. 
+Die Reise hat am Flughafen Schwechat begonnen. Nachdem ich noch einen gemütlichen Kaffee mit meiner Familie genossen habe und mich verabschiedet habe, sind auch schon die ersten lustigen Ereignisse passiert. Am Weg zum Gate hab ich einen Studienkollegen aus meiner FH getroffen, der gerade aus dem Urlaub zurückgekommen ist. Beim Gate die zweite Überraschung: Bibiza, ein bekannter Musiker aus Wien, sitzt am Gate und wartet auf die gleiche RyanAir Maschine nach Lissabon. Nach einem kurzen Fanmoment inklusive Foto ging es dann aber wirklich los. Dort angekommen, waren die Mitbewohner erstmal eine Überraschung. Anders als erwartet, habe ich auf einen ca. 40 jährigen Pakistani getroffen, der aber eigentlich ganz nett ist. 
 
 {{< slideshow >}}
