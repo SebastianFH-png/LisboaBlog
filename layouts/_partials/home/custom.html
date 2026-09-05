@@ -15,18 +15,21 @@
     {{ with site.Params.author.headline }}
       <p class="mx-auto mt-4 max-w-xl text-lg text-white/90 drop-shadow-sm">{{ . | emojify }}</p>
     {{ end }}
-    {{ if gt (len $posts) 1 }}
-      <button
-        type="button"
-        id="jump-to-oldest"
-        class="mt-6 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-4 py-2 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/25"
-      >
-        Zum ältesten Beitrag
-        {{ partial "icon.html" "chevron-down" }}
-      </button>
-    {{ end }}
   </div>
 </header>
+
+{{ if gt (len $posts) 1 }}
+  <div class="mb-10 flex justify-center">
+    <button
+      type="button"
+      id="jump-to-oldest"
+      class="inline-flex items-center gap-1.5 rounded-full border-2 border-primary-200 bg-white px-4 py-2 text-sm font-semibold text-neutral-700 shadow-sm transition hover:border-primary-400 hover:text-primary-600 dark:border-primary-800 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:text-primary-400"
+    >
+      Zum ältesten Beitrag
+      {{ partial "icon.html" "chevron-down" }}
+    </button>
+  </div>
+{{ end }}
 
 <div class="flex flex-col gap-16">
   {{ range $i, $post := $posts }}
