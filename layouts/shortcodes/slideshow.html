@@ -32,10 +32,10 @@
   </div>
 
   <button type="button" class="slideshow-prev absolute start-0 top-1/2 hidden -translate-y-1/2 rounded-full bg-neutral-900/50 p-2 text-white hover:bg-neutral-900/80 sm:flex" aria-label="Zurück">
-    {{ partial "icon.html" "chevron-left" }}
+    <span class="inline-block rotate-90">{{ partial "icon.html" "chevron-down" }}</span>
   </button>
   <button type="button" class="slideshow-next absolute end-0 top-1/2 hidden -translate-y-1/2 rounded-full bg-neutral-900/50 p-2 text-white hover:bg-neutral-900/80 sm:flex" aria-label="Weiter">
-    {{ partial "icon.html" "chevron-right" }}
+    <span class="inline-block -rotate-90">{{ partial "icon.html" "chevron-down" }}</span>
   </button>
 
   <div class="slideshow-dots mt-3 flex justify-center gap-2">

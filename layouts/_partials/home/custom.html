@@ -15,12 +15,22 @@
     {{ with site.Params.author.headline }}
       <p class="mx-auto mt-4 max-w-xl text-lg text-white/90 drop-shadow-sm">{{ . | emojify }}</p>
     {{ end }}
+    {{ if gt (len $posts) 1 }}
+      <button
+        type="button"
+        id="jump-to-oldest"
+        class="mt-6 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-4 py-2 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/25"
+      >
+        Zum ältesten Beitrag
+        {{ partial "icon.html" "chevron-down" }}
+      </button>
+    {{ end }}
   </div>
 </header>
 
 <div class="flex flex-col gap-16">
   {{ range $i, $post := $posts }}
-    <article class="fade-in-up overflow-hidden rounded-2xl border-2 border-primary-200 bg-white shadow-md dark:border-primary-800 dark:bg-neutral-800/60">
+    <article {{ if eq $i (sub (len $posts) 1) }}id="oldest-post"{{ end }} class="fade-in-up overflow-hidden rounded-2xl border-2 border-primary-200 bg-white shadow-md dark:border-primary-800 dark:bg-neutral-800/60">
       <div class="border-b-2 border-primary-100 bg-primary-50 px-6 py-6 dark:border-primary-900 dark:bg-primary-950/40 sm:px-10">
         <h2 class="m-0 text-2xl font-extrabold sm:text-3xl">
           <a class="text-neutral-900 hover:text-primary-600 dark:text-neutral dark:hover:text-primary-400" href="{{ $post.RelPermalink }}">
@@ -39,3 +49,17 @@
     <p class="text-center text-neutral-500 dark:text-neutral-400">Noch keine Beiträge.</p>
   {{ end }}
 </div>
+
+{{ if gt (len $posts) 1 }}
+<script>
+(function () {
+  var btn = document.getElementById("jump-to-oldest");
+  var target = document.getElementById("oldest-post");
+  if (btn && target) {
+    btn.addEventListener("click", function () {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+})();
+</script>
+{{ end }}
