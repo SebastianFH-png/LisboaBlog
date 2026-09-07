@@ -43,13 +43,13 @@
       <img src="{{ .RelPermalink }}" alt="" class="hero-banner-img h-full w-full object-cover" loading="eager">
     </div>
   {{ end }}
-  <div class="absolute inset-0 bg-gradient-to-t from-neutral-900/90 via-neutral-900/40 to-neutral-900/20"></div>
+  <div class="absolute inset-0 bg-gradient-to-b from-neutral-900/70 via-neutral-900/55 to-neutral-900/75"></div>
   <div class="relative flex min-h-[92vh] flex-col items-center justify-center px-8 py-24">
-    <h1 id="hero-title" class="cursor-pointer select-none text-6xl font-extrabold uppercase leading-[0.95] tracking-tight drop-shadow-sm sm:text-8xl md:text-9xl" title="Klick mich ein paar Mal ;)">
+    <h1 id="hero-title" class="hero-text-shadow cursor-pointer select-none text-6xl font-extrabold uppercase leading-[0.95] tracking-tight sm:text-8xl md:text-9xl" title="Klick mich ein paar Mal ;)">
       {{ site.Title | emojify }}
     </h1>
     {{ with site.Params.author.headline }}
-      <p class="mx-auto mt-6 max-w-xl text-lg text-white/90 drop-shadow-sm sm:text-xl">{{ . | emojify }}</p>
+      <p class="hero-text-shadow mx-auto mt-6 max-w-xl text-lg text-white/95 sm:text-xl">{{ . | emojify }}</p>
     {{ end }}
     <a href="#story" class="scroll-cue mt-14 text-white/80 transition hover:text-white" aria-label="Runterscrollen">
       {{ partial "icon.html" "chevron-down" }}
