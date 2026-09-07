@@ -5,7 +5,7 @@
 {{ $heroPost := site.GetPage "posts/erste-tage" }}
 {{ $heroImg := "" }}
 {{ if $heroPost }}
-  {{ $heroImg = $heroPost.Resources.GetMatch "photo3.jpg" }}
+  {{ $heroImg = $heroPost.Resources.GetMatch "photo8.jpg" }}
 {{ end }}
 {{ $hero := "" }}
 {{ if $heroImg }}
@@ -32,35 +32,12 @@
   {{ if lt $dayCount 1 }}{{ $dayCount = 1 }}{{ end }}
 {{ end }}
 
-{{/* ---------- "Moments" story sequence — hand-picked, chronological ---------- */}}
-{{ $momentDefs := slice
-  (dict "post" "posts/anreise" "photo" "photo3.jpg" "caption" "Die Küste im Landeanflug")
-  (dict "post" "posts/erste-tage" "photo" "photo3.jpg" "caption" "Bunte Nächte in der Altstadt")
-  (dict "post" "posts/erste-tage" "photo" "photo7.jpg" "caption" "Gelato im goldenen Licht")
-  (dict "post" "posts/erstes-wochenende" "photo" "photo3.jpg" "caption" "Gelbe Bahnen, blauer Himmel")
-  (dict "post" "posts/erstes-wochenende" "photo" "photo4.jpg" "caption" "Erster Sprung ins Meer")
-}}
-{{ $moments := slice }}
-{{ range $momentDefs }}
-  {{ $p := site.GetPage .post }}
-  {{ if $p }}
-    {{ $img := $p.Resources.GetMatch .photo }}
-    {{ if $img }}
-      {{ $resized := "" }}
-      {{ if gt $img.Height $img.Width }}
-        {{ $resized = $img.Resize "x1400 webp q80" }}
-      {{ else }}
-        {{ $resized = $img.Resize "1600x webp q80" }}
-      {{ end }}
-      {{ $moments = $moments | append (dict "src" $resized.RelPermalink "caption" .caption "postURL" $p.RelPermalink) }}
-    {{ end }}
-  {{ end }}
-{{ end }}
+<div id="cursor-glow" class="pointer-events-none fixed left-0 top-0 z-0 h-[32rem] w-[32rem] rounded-full opacity-0 blur-3xl transition-opacity duration-700"></div>
 
 <div id="scroll-progress" class="fixed inset-x-0 top-0 z-50 h-1 origin-left scale-x-0 bg-primary-500"></div>
 
 {{/* ---------- Hero ---------- */}}
-<header id="hero" class="hero-banner relative -mt-6 mb-20 overflow-hidden text-center text-white sm:-mt-10">
+<header id="hero" class="hero-banner relative -mt-6 mb-4 overflow-hidden text-center text-white sm:-mt-10">
   {{ with $hero }}
     <div id="hero-parallax" class="absolute -inset-6">
       <img src="{{ .RelPermalink }}" alt="" class="hero-banner-img h-full w-full object-cover" loading="eager">
@@ -68,67 +45,49 @@
   {{ end }}
   <div class="absolute inset-0 bg-gradient-to-t from-neutral-900/90 via-neutral-900/40 to-neutral-900/20"></div>
   <div class="relative flex min-h-[92vh] flex-col items-center justify-center px-8 py-24">
-    <h1 id="hero-title" class="cursor-pointer select-none text-5xl font-extrabold tracking-tight drop-shadow-sm sm:text-7xl" title="Klick mich ein paar Mal ;)">
+    <h1 id="hero-title" class="cursor-pointer select-none text-6xl font-extrabold uppercase leading-[0.95] tracking-tight drop-shadow-sm sm:text-8xl md:text-9xl" title="Klick mich ein paar Mal ;)">
       {{ site.Title | emojify }}
     </h1>
     {{ with site.Params.author.headline }}
-      <p class="mx-auto mt-5 max-w-xl text-lg text-white/90 drop-shadow-sm sm:text-xl">{{ . | emojify }}</p>
+      <p class="mx-auto mt-6 max-w-xl text-lg text-white/90 drop-shadow-sm sm:text-xl">{{ . | emojify }}</p>
     {{ end }}
-    <a href="#moments" class="scroll-cue mt-14 text-white/80 transition hover:text-white" aria-label="Runterscrollen">
+    <a href="#story" class="scroll-cue mt-14 text-white/80 transition hover:text-white" aria-label="Runterscrollen">
       {{ partial "icon.html" "chevron-down" }}
     </a>
   </div>
 </header>
 
+{{/* ---------- Big scroll-driven statement ---------- */}}
+<section id="story" class="reveal-rotate relative my-28 px-6 text-center sm:my-40">
+  <p class="mx-auto max-w-4xl text-4xl font-extrabold uppercase leading-[1.05] tracking-tight text-neutral-900 dark:text-neutral sm:text-6xl md:text-7xl">
+    {{ $dayCount }} Tage. {{ $photoCount }} Fotos.<br>
+    <span class="text-primary-600 dark:text-primary-400">Ein Semester in Lissabon.</span>
+  </p>
+</section>
+
 {{/* ---------- Stats strip ---------- */}}
-<section class="fade-in-up mx-auto mb-24 grid max-w-4xl grid-cols-2 gap-4 px-2 sm:grid-cols-4 sm:gap-6">
+<section class="mx-auto mb-28 grid max-w-4xl grid-cols-2 gap-4 px-2 sm:grid-cols-4 sm:gap-6">
   {{ $stats := slice
     (dict "value" $dayCount "label" "Tage vor Ort")
     (dict "value" (len $posts) "label" "Beiträge")
     (dict "value" $photoCount "label" "Fotos")
     (dict "value" $placeCount "label" "Orte auf der Karte")
   }}
-  {{ range $stats }}
-  <div class="rounded-2xl border-2 border-primary-100 bg-white px-3 py-6 text-center shadow-sm dark:border-primary-900 dark:bg-neutral-800/60">
-    <div class="stat-number text-3xl font-extrabold text-primary-600 dark:text-primary-400 sm:text-4xl" data-target="{{ .value }}">0</div>
-    <div class="mt-1 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400 sm:text-sm">{{ .label }}</div>
+  {{ range $i, $s := $stats }}
+  <div class="reveal-pop tilt-card rounded-2xl border-2 border-primary-100 bg-white px-3 py-8 text-center shadow-sm transition-shadow hover:shadow-lg dark:border-primary-900 dark:bg-neutral-800/60" style="transition-delay: {{ mul $i 80 }}ms">
+    <div class="stat-number text-4xl font-extrabold text-primary-600 dark:text-primary-400 sm:text-5xl" data-target="{{ $s.value }}">0</div>
+    <div class="mt-1 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400 sm:text-sm">{{ $s.label }}</div>
   </div>
   {{ end }}
 </section>
 
-{{/* ---------- "Moments" swipe gallery — horizontal scroll-snap, no forced page scroll ---------- */}}
-{{ if gt (len $moments) 0 }}
-<section id="moments" class="fade-in-up relative mb-24">
-  <div class="mb-6 text-center">
-    <span class="text-xs font-semibold uppercase tracking-widest text-primary-500">Ein paar Momente</span>
-  </div>
-  <div class="moments-track flex h-[60vh] snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth rounded-2xl pb-2 sm:h-[70vh]">
-    {{ range $i, $m := $moments }}
-    <a href="{{ $m.postURL }}" class="moment-slide group relative h-full w-[88%] flex-none snap-center overflow-hidden rounded-2xl shadow-md sm:w-[64%]">
-      <img src="{{ $m.src }}" alt="{{ $m.caption }}" class="moment-tilt h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy">
-      <div class="absolute inset-0 bg-gradient-to-t from-neutral-900/80 via-neutral-900/10 to-transparent"></div>
-      <div class="absolute inset-x-0 bottom-0 p-6 sm:p-10">
-        <span class="text-xs font-semibold uppercase tracking-widest text-primary-300">{{ add $i 1 }} / {{ len $moments }}</span>
-        <p class="mt-2 max-w-md text-xl font-bold text-white drop-shadow-sm sm:text-3xl">{{ $m.caption }}</p>
-      </div>
-    </a>
-    {{ end }}
-  </div>
-  <div class="mt-4 flex justify-center gap-2">
-    {{ range $i, $m := $moments }}
-    <span class="moment-dot h-1.5 w-6 rounded-full bg-primary-200 transition-all dark:bg-primary-800" data-index="{{ $i }}"></span>
-    {{ end }}
-  </div>
-</section>
-{{ end }}
-
 {{/* ---------- Latest post spotlight ---------- */}}
 {{ with $latest }}
-<section class="fade-in-up mb-24">
+<section class="reveal-pop mb-28">
   <div class="mb-6 text-center">
     <span class="text-xs font-semibold uppercase tracking-widest text-primary-500">Neuester Beitrag</span>
   </div>
-  <article class="overflow-hidden rounded-2xl border-2 border-primary-200 bg-white shadow-md dark:border-primary-800 dark:bg-neutral-800/60">
+  <article class="tilt-card overflow-hidden rounded-2xl border-2 border-primary-200 bg-white shadow-md transition-shadow hover:shadow-xl dark:border-primary-800 dark:bg-neutral-800/60">
     <div class="border-b-2 border-primary-100 bg-primary-50 px-6 py-6 dark:border-primary-900 dark:bg-primary-900/40 sm:px-10">
       <h2 class="m-0 text-2xl font-extrabold sm:text-3xl">
         <a class="text-neutral-900 hover:text-primary-600 dark:text-neutral dark:hover:text-primary-400" href="{{ .RelPermalink }}">
@@ -144,7 +103,7 @@
     </div>
   </article>
   <div class="mt-8 flex justify-center">
-    <a href="{{ "posts" | relURL }}" class="inline-flex items-center gap-1.5 rounded-full bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700">
+    <a href="{{ "posts" | relURL }}" class="magnetic-btn inline-flex items-center gap-1.5 rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700">
       Alle Beiträge lesen
     </a>
   </div>
@@ -153,13 +112,13 @@
 
 {{/* ---------- Map teaser ---------- */}}
 {{ if or (gt (len $pins.photoPins) 0) (gt (len $pins.postPins) 0) }}
-<section class="fade-in-up mb-8">
+<section class="reveal-pop mb-8">
   <div class="mb-6 text-center">
     <h2 class="text-2xl font-extrabold sm:text-3xl">Wo ich schon war</h2>
     <p class="mt-1 text-neutral-500 dark:text-neutral-400">{{ $placeCount }} Orte, direkt aus den GPS-Daten der Fotos.</p>
   </div>
-  <a href="{{ "map" | relURL }}" class="group relative block h-64 overflow-hidden rounded-2xl border-2 border-primary-200 shadow-md dark:border-primary-800 sm:h-80">
-    <div id="mini-map" class="pointer-events-none h-full w-full"></div>
+  <a href="{{ "map" | relURL }}" class="tilt-card group relative block h-64 overflow-hidden rounded-2xl border-2 border-primary-200 shadow-md transition-shadow hover:shadow-xl dark:border-primary-800 sm:h-80">
+    <div id="mini-map" class="pointer-events-none h-full w-full transition-transform duration-500 group-hover:scale-105"></div>
     <div class="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-neutral-900/70 via-transparent to-transparent p-6">
       <span class="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-sm font-semibold text-neutral-800 shadow-sm transition group-hover:bg-primary-50">
         Zur vollständigen Karte
@@ -192,6 +151,8 @@
 
 <script>
 (function () {
+  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
   /* Scroll progress bar */
   var bar = document.getElementById("scroll-progress");
   function updateProgress() {
@@ -202,7 +163,15 @@
   window.addEventListener("scroll", updateProgress, { passive: true });
   updateProgress();
 
-  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  /* Ambient cursor glow, whole page */
+  var glow = document.getElementById("cursor-glow");
+  if (glow && !reduceMotion) {
+    var shown = false;
+    window.addEventListener("mousemove", function (e) {
+      glow.style.transform = "translate(" + (e.pageX - 256) + "px," + (e.pageY - 256) + "px)";
+      if (!shown) { shown = true; glow.style.opacity = "1"; }
+    }, { passive: true });
+  }
 
   /* Hero mouse parallax */
   var hero = document.getElementById("hero");
@@ -280,59 +249,60 @@
     statEls.forEach(function (el) { el.textContent = el.getAttribute("data-target"); });
   }
 
-  /* Moments swipe gallery: highlight the dot for whichever slide is centered */
-  var momentsSection = document.getElementById("moments");
-  if (momentsSection) {
-    var track = momentsSection.querySelector(".moments-track");
-    var slides = Array.prototype.slice.call(track.children);
-    var dots = Array.prototype.slice.call(momentsSection.querySelectorAll(".moment-dot"));
-
-    function currentMoment() {
-      var trackRect = track.getBoundingClientRect();
-      var center = trackRect.left + trackRect.width / 2;
-      var closest = 0;
-      var closestDist = Infinity;
-      slides.forEach(function (s, i) {
-        var r = s.getBoundingClientRect();
-        var dist = Math.abs((r.left + r.width / 2) - center);
-        if (dist < closestDist) { closestDist = dist; closest = i; }
+  /* Generic reveal-on-scroll: pop (scale+rotate) and rotate-in (big statement) */
+  if ("IntersectionObserver" in window) {
+    var revealObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-revealed");
+          revealObserver.unobserve(entry.target);
+        }
       });
-      return closest;
-    }
-
-    function updateDots() {
-      var active = currentMoment();
-      dots.forEach(function (d, i) {
-        d.classList.toggle("bg-primary-600", i === active);
-        d.classList.toggle("dark:bg-primary-400", i === active);
-        d.classList.toggle("w-10", i === active);
-      });
-    }
-
-    track.addEventListener("scroll", function () {
-      window.requestAnimationFrame(updateDots);
-    }, { passive: true });
-
-    dots.forEach(function (dot, i) {
-      dot.addEventListener("click", function () {
-        slides[i].scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-      });
+    }, { threshold: 0.2 });
+    document.querySelectorAll(".reveal-pop, .reveal-rotate").forEach(function (el) {
+      revealObserver.observe(el);
     });
-
-    updateDots();
+  } else {
+    document.querySelectorAll(".reveal-pop, .reveal-rotate").forEach(function (el) {
+      el.classList.add("is-revealed");
+    });
   }
 
-  /* Subtle tilt on moment images */
+  /* Continuous scroll-driven scale on the big statement */
+  var story = document.getElementById("story");
+  if (story && !reduceMotion) {
+    function updateStory() {
+      var r = story.getBoundingClientRect();
+      var vh = window.innerHeight;
+      var center = r.top + r.height / 2;
+      var dist = Math.abs(center - vh / 2) / vh;
+      var scale = Math.max(0.85, 1 - dist * 0.3);
+      story.style.setProperty("--story-scale", scale.toFixed(3));
+    }
+    window.addEventListener("scroll", function () { requestAnimationFrame(updateStory); }, { passive: true });
+    updateStory();
+  }
+
+  /* Tilt + lift on any card marked .tilt-card */
   if (!reduceMotion) {
-    document.querySelectorAll(".moment-tilt").forEach(function (img) {
-      var wrap = img.closest(".moment-slide");
-      wrap.addEventListener("mousemove", function (e) {
-        var r = wrap.getBoundingClientRect();
+    document.querySelectorAll(".tilt-card").forEach(function (card) {
+      card.addEventListener("mousemove", function (e) {
+        var r = card.getBoundingClientRect();
         var x = (e.clientX - r.left) / r.width - 0.5;
         var y = (e.clientY - r.top) / r.height - 0.5;
-        img.style.transform = "scale(1.03) rotate(" + (x * 1.2) + "deg) translate(" + (x * -6) + "px," + (y * -6) + "px)";
+        card.style.transform = "perspective(800px) rotateX(" + (y * -6) + "deg) rotateY(" + (x * 6) + "deg) translateY(-4px)";
       });
-      wrap.addEventListener("mouseleave", function () { img.style.transform = ""; });
+      card.addEventListener("mouseleave", function () { card.style.transform = ""; });
+    });
+
+    document.querySelectorAll(".magnetic-btn").forEach(function (btn) {
+      btn.addEventListener("mousemove", function (e) {
+        var r = btn.getBoundingClientRect();
+        var x = (e.clientX - r.left) / r.width - 0.5;
+        var y = (e.clientY - r.top) / r.height - 0.5;
+        btn.style.transform = "translate(" + (x * 10) + "px," + (y * 10) + "px)";
+      });
+      btn.addEventListener("mouseleave", function () { btn.style.transform = ""; });
     });
   }
 })();
