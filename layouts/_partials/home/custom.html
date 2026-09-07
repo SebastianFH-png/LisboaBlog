@@ -51,14 +51,21 @@
     {{ with site.Params.author.headline }}
       <p class="hero-text-shadow mx-auto mt-6 max-w-xl text-lg text-neutral-50/95 sm:text-xl">{{ . | emojify }}</p>
     {{ end }}
-    <a href="#stats" class="scroll-cue mt-14 text-neutral-50/80 transition hover:text-neutral-50" aria-label="Runterscrollen">
+    <a href="#story" class="scroll-cue mt-14 text-neutral-50/80 transition hover:text-neutral-50" aria-label="Runterscrollen">
       {{ partial "icon.html" "chevron-down" }}
     </a>
   </div>
 </header>
 
+{{/* ---------- Big scroll-driven statement ---------- */}}
+<section id="story" class="reveal-rotate relative my-28 px-6 text-center sm:my-40">
+  <p class="mx-auto max-w-4xl text-4xl font-extrabold uppercase leading-[1.05] tracking-tight text-primary-600 dark:text-primary-400 sm:text-6xl md:text-7xl">
+    Ein Semester in Lissabon.
+  </p>
+</section>
+
 {{/* ---------- Stats strip ---------- */}}
-<section id="stats" class="mx-auto mb-28 mt-28 grid max-w-3xl grid-cols-3 gap-4 px-2 sm:mt-40 sm:gap-6">
+<section id="stats" class="mx-auto mb-28 grid max-w-3xl grid-cols-3 gap-4 px-2 sm:gap-6">
   {{ $stats := slice
     (dict "value" $dayCount "label" "Tage vor Ort")
     (dict "value" (len $posts) "label" "Beiträge")
@@ -250,13 +257,28 @@
         }
       });
     }, { threshold: 0.2 });
-    document.querySelectorAll(".reveal-pop").forEach(function (el) {
+    document.querySelectorAll(".reveal-pop, .reveal-rotate").forEach(function (el) {
       revealObserver.observe(el);
     });
   } else {
-    document.querySelectorAll(".reveal-pop").forEach(function (el) {
+    document.querySelectorAll(".reveal-pop, .reveal-rotate").forEach(function (el) {
       el.classList.add("is-revealed");
     });
+  }
+
+  /* Continuous scroll-driven scale on the big statement */
+  var story = document.getElementById("story");
+  if (story && !reduceMotion) {
+    function updateStory() {
+      var r = story.getBoundingClientRect();
+      var vh = window.innerHeight;
+      var center = r.top + r.height / 2;
+      var dist = Math.abs(center - vh / 2) / vh;
+      var scale = Math.max(0.85, 1 - dist * 0.3);
+      story.style.setProperty("--story-scale", scale.toFixed(3));
+    }
+    window.addEventListener("scroll", function () { requestAnimationFrame(updateStory); }, { passive: true });
+    updateStory();
   }
 
   /* Tilt + lift on any card marked .tilt-card */
@@ -266,7 +288,7 @@
         var r = card.getBoundingClientRect();
         var x = (e.clientX - r.left) / r.width - 0.5;
         var y = (e.clientY - r.top) / r.height - 0.5;
-        card.style.transform = "perspective(800px) rotateX(" + (y * -6) + "deg) rotateY(" + (x * 6) + "deg) translateY(-4px)";
+        card.style.transform = "perspective(1200px) rotateX(" + (y * -2.5) + "deg) rotateY(" + (x * 2.5) + "deg) translateY(-3px)";
       });
       card.addEventListener("mouseleave", function () { card.style.transform = ""; });
     });
