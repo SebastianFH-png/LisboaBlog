@@ -33,6 +33,9 @@ article h1 {
 .hero-banner {
   min-height: 22rem;
 }
+.hero-text-shadow {
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.85);
+}
 .hero-banner-img {
   animation: hero-kenburns 24s ease-in-out infinite alternate;
 }
@@ -83,4 +86,74 @@ article h1 {
   line-height: 16px;
   text-align: center;
   border: 2px solid white;
+}
+
+#scroll-progress {
+  transition: transform 0.1s linear;
+}
+
+#hero-parallax {
+  transition: transform 0.2s ease-out;
+}
+
+.scroll-cue {
+  animation: scroll-cue-bounce 2s ease-in-out infinite;
+}
+@keyframes scroll-cue-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue { animation: none; }
+  #hero-parallax { transition: none; }
+}
+
+.stat-number {
+  font-variant-numeric: tabular-nums;
+}
+
+#cursor-glow {
+  background: radial-gradient(circle, rgba(var(--color-primary-500), 0.22), transparent 70%);
+  transition: transform 0.12s linear, opacity 0.7s ease;
+}
+
+.reveal-pop {
+  opacity: 0;
+  transform: scale(0.85) rotate(-2deg);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-pop.is-revealed {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+
+.reveal-rotate p {
+  opacity: 0;
+  transform: scale(0.6) rotate(-6deg);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-rotate.is-revealed p {
+  opacity: 1;
+  transform: scale(var(--story-scale, 1)) rotate(0deg);
+}
+
+.tilt-card {
+  transition: transform 0.25s ease-out, box-shadow 0.2s ease;
+  will-change: transform;
+}
+
+.magnetic-btn {
+  transition: transform 0.15s ease-out, background-color 0.2s ease;
+}
+
+.prose {
+  font-size: 1.0625rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-pop, .reveal-rotate p {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }

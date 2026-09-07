@@ -1,0 +1,38 @@
+{{ $posts := where site.RegularPages "Section" "posts" }}
+
+{{/* One entry per photo that carries GPS EXIF data, grouped client-side by rounded coordinate */}}
+{{ $photoPins := slice }}
+{{ range $posts }}
+  {{ $post := . }}
+  {{ range $post.Resources.ByType "image" }}
+    {{ $exif := .Exif }}
+    {{ if and $exif (ne $exif.Lat 0.0) (ne $exif.Long 0.0) }}
+      {{ $thumb := .Fill "160x160 webp q70 Center" }}
+      {{ $full := .Resize "1600x webp q80" }}
+      {{ $photoPins = $photoPins | append (dict
+        "lat" $exif.Lat
+        "lon" $exif.Long
+        "thumb" $thumb.RelPermalink
+        "full" $full.RelPermalink
+        "postURL" $post.RelPermalink
+        "postTitle" $post.Title
+      ) }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+
+{{/* Fallback: posts with a manual lat/lon but no GPS-tagged photos */}}
+{{ $postPins := slice }}
+{{ range $posts }}
+  {{ if and .Params.lat .Params.lon }}
+    {{ $postPins = $postPins | append (dict
+      "lat" .Params.lat
+      "lon" .Params.lon
+      "postURL" .RelPermalink
+      "postTitle" .Title
+      "location" (.Params.location | default "")
+    ) }}
+  {{ end }}
+{{ end }}
+
+{{ return (dict "photoPins" $photoPins "postPins" $postPins) }}
