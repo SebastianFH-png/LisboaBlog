@@ -5,7 +5,7 @@
   {{ $hero = $heroSrc.Resize "1920x webp q80" }}
 {{ end }}
 
-<header class="fade-in-up hero-banner relative mb-16 overflow-hidden rounded-2xl text-center text-white shadow-lg">
+<header class="fade-in-up hero-banner relative mb-16 overflow-hidden rounded-2xl text-center text-neutral-50 shadow-lg">
   {{ with $hero }}
     <img src="{{ .RelPermalink }}" alt="" class="hero-banner-img absolute inset-0 h-full w-full object-cover" loading="eager">
   {{ end }}
@@ -13,7 +13,7 @@
   <div class="relative px-8 pb-20 pt-10 sm:pb-32 sm:pt-16">
     <h1 class="text-4xl font-extrabold tracking-tight drop-shadow-sm sm:text-6xl">{{ site.Title | emojify }}</h1>
     {{ with site.Params.author.headline }}
-      <p class="mx-auto mt-4 max-w-xl text-lg text-white/90 drop-shadow-sm">{{ . | emojify }}</p>
+      <p class="mx-auto mt-4 max-w-xl text-lg text-neutral-50/90 drop-shadow-sm">{{ . | emojify }}</p>
     {{ end }}
   </div>
 </header>
@@ -23,7 +23,7 @@
     <button
       type="button"
       id="jump-to-oldest"
-      class="inline-flex items-center gap-1.5 rounded-full border-2 border-primary-200 bg-white px-4 py-2 text-sm font-semibold text-neutral-700 shadow-sm transition hover:border-primary-400 hover:text-primary-600 dark:border-primary-800 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:text-primary-400"
+      class="inline-flex items-center gap-1.5 rounded-full border-2 border-primary-200 bg-neutral px-4 py-2 text-sm font-semibold text-neutral-700 shadow-sm transition hover:border-primary-400 hover:text-primary-600 dark:border-primary-800 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:text-primary-400"
     >
       Zum ältesten Beitrag
       {{ partial "icon.html" "chevron-down" }}
@@ -33,7 +33,7 @@
 
 <div class="flex flex-col gap-16">
   {{ range $i, $post := $posts }}
-    <article {{ if eq $i (sub (len $posts) 1) }}id="oldest-post"{{ end }} class="fade-in-up overflow-hidden rounded-2xl border-2 border-primary-200 bg-white shadow-md dark:border-primary-800 dark:bg-neutral-800/60">
+    <article {{ if eq $i (sub (len $posts) 1) }}id="oldest-post"{{ end }} class="fade-in-up overflow-hidden rounded-2xl border-2 border-primary-200 bg-neutral shadow-md dark:border-primary-800 dark:bg-neutral-800/60">
       <div class="border-b-2 border-primary-100 bg-primary-50 px-6 py-6 dark:border-primary-900 dark:bg-primary-900/40 sm:px-10">
         <h2 class="m-0 text-2xl font-extrabold sm:text-3xl">
           <a class="text-neutral-900 hover:text-primary-600 dark:text-neutral dark:hover:text-primary-400" href="{{ $post.RelPermalink }}">
