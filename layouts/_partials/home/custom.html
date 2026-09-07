@@ -96,26 +96,28 @@
   {{ end }}
 </section>
 
-{{/* ---------- Pinned "moments" scroll story ---------- */}}
+{{/* ---------- "Moments" swipe gallery — horizontal scroll-snap, no forced page scroll ---------- */}}
 {{ if gt (len $moments) 0 }}
-<section id="moments" class="relative mb-24" style="height: {{ mul (len $moments) 100 }}vh">
-  <div class="sticky top-0 flex h-screen items-center justify-center overflow-hidden rounded-none sm:rounded-3xl">
+<section id="moments" class="fade-in-up relative mb-24">
+  <div class="mb-6 text-center">
+    <span class="text-xs font-semibold uppercase tracking-widest text-primary-500">Ein paar Momente</span>
+  </div>
+  <div class="moments-track flex h-[60vh] snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth rounded-2xl pb-2 sm:h-[70vh]">
     {{ range $i, $m := $moments }}
-    <a href="{{ $m.postURL }}" class="moment-slide absolute inset-0 block opacity-0 transition-opacity duration-700" data-index="{{ $i }}">
-      <img src="{{ $m.src }}" alt="{{ $m.caption }}" class="moment-tilt h-full w-full object-cover" loading="lazy">
+    <a href="{{ $m.postURL }}" class="moment-slide group relative h-full w-[88%] flex-none snap-center overflow-hidden rounded-2xl shadow-md sm:w-[64%]">
+      <img src="{{ $m.src }}" alt="{{ $m.caption }}" class="moment-tilt h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy">
       <div class="absolute inset-0 bg-gradient-to-t from-neutral-900/80 via-neutral-900/10 to-transparent"></div>
-      <div class="absolute inset-x-0 bottom-0 p-8 sm:p-14">
+      <div class="absolute inset-x-0 bottom-0 p-6 sm:p-10">
         <span class="text-xs font-semibold uppercase tracking-widest text-primary-300">{{ add $i 1 }} / {{ len $moments }}</span>
-        <p class="mt-2 max-w-lg text-2xl font-bold text-white drop-shadow-sm sm:text-4xl">{{ $m.caption }}</p>
+        <p class="mt-2 max-w-md text-xl font-bold text-white drop-shadow-sm sm:text-3xl">{{ $m.caption }}</p>
       </div>
     </a>
     {{ end }}
-
-    <div class="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 gap-2 sm:bottom-10">
-      {{ range $i, $m := $moments }}
-      <span class="moment-dot h-1.5 w-6 rounded-full bg-white/30 transition-all" data-index="{{ $i }}"></span>
-      {{ end }}
-    </div>
+  </div>
+  <div class="mt-4 flex justify-center gap-2">
+    {{ range $i, $m := $moments }}
+    <span class="moment-dot h-1.5 w-6 rounded-full bg-primary-200 transition-all dark:bg-primary-800" data-index="{{ $i }}"></span>
+    {{ end }}
   </div>
 </section>
 {{ end }}
@@ -278,32 +280,46 @@
     statEls.forEach(function (el) { el.textContent = el.getAttribute("data-target"); });
   }
 
-  /* Pinned moments story: activate slide by scroll position within the section */
+  /* Moments swipe gallery: highlight the dot for whichever slide is centered */
   var momentsSection = document.getElementById("moments");
   if (momentsSection) {
-    var slides = Array.prototype.slice.call(momentsSection.querySelectorAll(".moment-slide"));
+    var track = momentsSection.querySelector(".moments-track");
+    var slides = Array.prototype.slice.call(track.children);
     var dots = Array.prototype.slice.call(momentsSection.querySelectorAll(".moment-dot"));
-    var n = slides.length;
 
-    function updateMoments() {
-      var rect = momentsSection.getBoundingClientRect();
-      var total = rect.height - window.innerHeight;
-      var progress = total > 0 ? (-rect.top) / total : 0;
-      progress = Math.min(1, Math.max(0, progress));
-      var active = Math.min(n - 1, Math.floor(progress * n));
+    function currentMoment() {
+      var trackRect = track.getBoundingClientRect();
+      var center = trackRect.left + trackRect.width / 2;
+      var closest = 0;
+      var closestDist = Infinity;
       slides.forEach(function (s, i) {
-        s.style.opacity = i === active ? "1" : "0";
-        s.style.pointerEvents = i === active ? "auto" : "none";
+        var r = s.getBoundingClientRect();
+        var dist = Math.abs((r.left + r.width / 2) - center);
+        if (dist < closestDist) { closestDist = dist; closest = i; }
       });
+      return closest;
+    }
+
+    function updateDots() {
+      var active = currentMoment();
       dots.forEach(function (d, i) {
-        d.classList.toggle("bg-white", i === active);
+        d.classList.toggle("bg-primary-600", i === active);
+        d.classList.toggle("dark:bg-primary-400", i === active);
         d.classList.toggle("w-10", i === active);
-        d.classList.toggle("bg-white/30", i !== active);
       });
     }
-    window.addEventListener("scroll", updateMoments, { passive: true });
-    window.addEventListener("resize", updateMoments);
-    updateMoments();
+
+    track.addEventListener("scroll", function () {
+      window.requestAnimationFrame(updateDots);
+    }, { passive: true });
+
+    dots.forEach(function (dot, i) {
+      dot.addEventListener("click", function () {
+        slides[i].scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+      });
+    });
+
+    updateDots();
   }
 
   /* Subtle tilt on moment images */

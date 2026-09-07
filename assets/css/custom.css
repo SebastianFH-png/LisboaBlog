@@ -113,3 +113,6 @@ article h1 {
 .stat-number {
   font-variant-numeric: tabular-nums;
 }
+
+.moments-track::-webkit-scrollbar { display: none; }
+.moments-track { scrollbar-width: none; }
