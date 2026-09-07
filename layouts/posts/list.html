@@ -1,0 +1,11 @@
+{{ define "main" }}
+<article class="max-w-none">
+  <header class="fade-in-up mb-12 text-center">
+    <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl">{{ .Title | emojify }}</h1>
+    {{ with .Content }}
+      <div class="prose mx-auto mt-4 max-w-xl dark:prose-invert">{{ . }}</div>
+    {{ end }}
+  </header>
+  {{ partial "post-feed.html" . }}
+</article>
+{{ end }}

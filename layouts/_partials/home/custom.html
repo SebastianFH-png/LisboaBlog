@@ -1,68 +1,323 @@
 {{ $posts := (where site.RegularPages "Section" "posts").ByDate.Reverse }}
-{{ $heroSrc := resources.Get "images/hero-lisboa.jpg" }}
+{{ $latest := index $posts 0 }}
+
+{{/* ---------- Hero photo ---------- */}}
+{{ $heroPost := site.GetPage "posts/erste-tage" }}
+{{ $heroImg := "" }}
+{{ if $heroPost }}
+  {{ $heroImg = $heroPost.Resources.GetMatch "photo3.jpg" }}
+{{ end }}
 {{ $hero := "" }}
-{{ if $heroSrc }}
-  {{ $hero = $heroSrc.Resize "1920x webp q80" }}
+{{ if $heroImg }}
+  {{ $hero = $heroImg.Resize "1920x webp q80" }}
 {{ end }}
 
-<header class="fade-in-up hero-banner relative mb-16 overflow-hidden rounded-2xl text-center text-white shadow-lg">
-  {{ with $hero }}
-    <img src="{{ .RelPermalink }}" alt="" class="hero-banner-img absolute inset-0 h-full w-full object-cover" loading="eager">
-  {{ end }}
-  <div class="absolute inset-0 bg-gradient-to-t from-neutral-900/85 via-neutral-900/35 to-primary-900/20"></div>
-  <div class="relative px-8 pb-20 pt-10 sm:pb-32 sm:pt-16">
-    <h1 class="text-4xl font-extrabold tracking-tight drop-shadow-sm sm:text-6xl">{{ site.Title | emojify }}</h1>
-    {{ with site.Params.author.headline }}
-      <p class="mx-auto mt-4 max-w-xl text-lg text-white/90 drop-shadow-sm">{{ . | emojify }}</p>
+{{/* ---------- Stats ---------- */}}
+{{ $pins := partial "gps-pins.html" . }}
+{{ $placeScratch := newScratch }}
+{{ range $pins.photoPins }}
+  {{ $placeScratch.SetInMap "places" (printf "%.2f,%.2f" .lat .lon) true }}
+{{ end }}
+{{ $placeCount := len ($placeScratch.GetSortedMapValues "places") }}
+
+{{ $photoCount := 0 }}
+{{ range where site.RegularPages "Section" "posts" }}
+  {{ $photoCount = add $photoCount (len (.Resources.ByType "image")) }}
+{{ end }}
+
+{{ $dayCount := 0 }}
+{{ if gt (len $posts) 0 }}
+  {{ $firstDate := (index $posts (sub (len $posts) 1)).Date }}
+  {{ $dayCount = int (div (now.Sub $firstDate).Hours 24) }}
+  {{ if lt $dayCount 1 }}{{ $dayCount = 1 }}{{ end }}
+{{ end }}
+
+{{/* ---------- "Moments" story sequence — hand-picked, chronological ---------- */}}
+{{ $momentDefs := slice
+  (dict "post" "posts/anreise" "photo" "photo3.jpg" "caption" "Die Küste im Landeanflug")
+  (dict "post" "posts/erste-tage" "photo" "photo3.jpg" "caption" "Bunte Nächte in der Altstadt")
+  (dict "post" "posts/erste-tage" "photo" "photo7.jpg" "caption" "Gelato im goldenen Licht")
+  (dict "post" "posts/erstes-wochenende" "photo" "photo3.jpg" "caption" "Gelbe Bahnen, blauer Himmel")
+  (dict "post" "posts/erstes-wochenende" "photo" "photo4.jpg" "caption" "Erster Sprung ins Meer")
+}}
+{{ $moments := slice }}
+{{ range $momentDefs }}
+  {{ $p := site.GetPage .post }}
+  {{ if $p }}
+    {{ $img := $p.Resources.GetMatch .photo }}
+    {{ if $img }}
+      {{ $resized := "" }}
+      {{ if gt $img.Height $img.Width }}
+        {{ $resized = $img.Resize "x1400 webp q80" }}
+      {{ else }}
+        {{ $resized = $img.Resize "1600x webp q80" }}
+      {{ end }}
+      {{ $moments = $moments | append (dict "src" $resized.RelPermalink "caption" .caption "postURL" $p.RelPermalink) }}
     {{ end }}
+  {{ end }}
+{{ end }}
+
+<div id="scroll-progress" class="fixed inset-x-0 top-0 z-50 h-1 origin-left scale-x-0 bg-primary-500"></div>
+
+{{/* ---------- Hero ---------- */}}
+<header id="hero" class="hero-banner relative -mt-6 mb-20 overflow-hidden text-center text-white sm:-mt-10">
+  {{ with $hero }}
+    <div id="hero-parallax" class="absolute -inset-6">
+      <img src="{{ .RelPermalink }}" alt="" class="hero-banner-img h-full w-full object-cover" loading="eager">
+    </div>
+  {{ end }}
+  <div class="absolute inset-0 bg-gradient-to-t from-neutral-900/90 via-neutral-900/40 to-neutral-900/20"></div>
+  <div class="relative flex min-h-[92vh] flex-col items-center justify-center px-8 py-24">
+    <h1 id="hero-title" class="cursor-pointer select-none text-5xl font-extrabold tracking-tight drop-shadow-sm sm:text-7xl" title="Klick mich ein paar Mal ;)">
+      {{ site.Title | emojify }}
+    </h1>
+    {{ with site.Params.author.headline }}
+      <p class="mx-auto mt-5 max-w-xl text-lg text-white/90 drop-shadow-sm sm:text-xl">{{ . | emojify }}</p>
+    {{ end }}
+    <a href="#moments" class="scroll-cue mt-14 text-white/80 transition hover:text-white" aria-label="Runterscrollen">
+      {{ partial "icon.html" "chevron-down" }}
+    </a>
   </div>
 </header>
 
-{{ if gt (len $posts) 1 }}
-  <div class="mb-10 flex justify-center">
-    <button
-      type="button"
-      id="jump-to-oldest"
-      class="inline-flex items-center gap-1.5 rounded-full border-2 border-primary-200 bg-white px-4 py-2 text-sm font-semibold text-neutral-700 shadow-sm transition hover:border-primary-400 hover:text-primary-600 dark:border-primary-800 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:text-primary-400"
-    >
-      Zum ältesten Beitrag
-      {{ partial "icon.html" "chevron-down" }}
-    </button>
+{{/* ---------- Stats strip ---------- */}}
+<section class="fade-in-up mx-auto mb-24 grid max-w-4xl grid-cols-2 gap-4 px-2 sm:grid-cols-4 sm:gap-6">
+  {{ $stats := slice
+    (dict "value" $dayCount "label" "Tage vor Ort")
+    (dict "value" (len $posts) "label" "Beiträge")
+    (dict "value" $photoCount "label" "Fotos")
+    (dict "value" $placeCount "label" "Orte auf der Karte")
+  }}
+  {{ range $stats }}
+  <div class="rounded-2xl border-2 border-primary-100 bg-white px-3 py-6 text-center shadow-sm dark:border-primary-900 dark:bg-neutral-800/60">
+    <div class="stat-number text-3xl font-extrabold text-primary-600 dark:text-primary-400 sm:text-4xl" data-target="{{ .value }}">0</div>
+    <div class="mt-1 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400 sm:text-sm">{{ .label }}</div>
   </div>
+  {{ end }}
+</section>
+
+{{/* ---------- Pinned "moments" scroll story ---------- */}}
+{{ if gt (len $moments) 0 }}
+<section id="moments" class="relative mb-24" style="height: {{ mul (len $moments) 100 }}vh">
+  <div class="sticky top-0 flex h-screen items-center justify-center overflow-hidden rounded-none sm:rounded-3xl">
+    {{ range $i, $m := $moments }}
+    <a href="{{ $m.postURL }}" class="moment-slide absolute inset-0 block opacity-0 transition-opacity duration-700" data-index="{{ $i }}">
+      <img src="{{ $m.src }}" alt="{{ $m.caption }}" class="moment-tilt h-full w-full object-cover" loading="lazy">
+      <div class="absolute inset-0 bg-gradient-to-t from-neutral-900/80 via-neutral-900/10 to-transparent"></div>
+      <div class="absolute inset-x-0 bottom-0 p-8 sm:p-14">
+        <span class="text-xs font-semibold uppercase tracking-widest text-primary-300">{{ add $i 1 }} / {{ len $moments }}</span>
+        <p class="mt-2 max-w-lg text-2xl font-bold text-white drop-shadow-sm sm:text-4xl">{{ $m.caption }}</p>
+      </div>
+    </a>
+    {{ end }}
+
+    <div class="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 gap-2 sm:bottom-10">
+      {{ range $i, $m := $moments }}
+      <span class="moment-dot h-1.5 w-6 rounded-full bg-white/30 transition-all" data-index="{{ $i }}"></span>
+      {{ end }}
+    </div>
+  </div>
+</section>
 {{ end }}
 
-<div class="flex flex-col gap-16">
-  {{ range $i, $post := $posts }}
-    <article {{ if eq $i (sub (len $posts) 1) }}id="oldest-post"{{ end }} class="fade-in-up overflow-hidden rounded-2xl border-2 border-primary-200 bg-white shadow-md dark:border-primary-800 dark:bg-neutral-800/60">
-      <div class="border-b-2 border-primary-100 bg-primary-50 px-6 py-6 dark:border-primary-900 dark:bg-primary-900/40 sm:px-10">
-        <h2 class="m-0 text-2xl font-extrabold sm:text-3xl">
-          <a class="text-neutral-900 hover:text-primary-600 dark:text-neutral dark:hover:text-primary-400" href="{{ $post.RelPermalink }}">
-            {{ $post.Title | emojify }}
-          </a>
-        </h2>
-        <div class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
-          {{ partial "article-meta.html" (dict "context" $post "scope" "list") }}
-        </div>
+{{/* ---------- Latest post spotlight ---------- */}}
+{{ with $latest }}
+<section class="fade-in-up mb-24">
+  <div class="mb-6 text-center">
+    <span class="text-xs font-semibold uppercase tracking-widest text-primary-500">Neuester Beitrag</span>
+  </div>
+  <article class="overflow-hidden rounded-2xl border-2 border-primary-200 bg-white shadow-md dark:border-primary-800 dark:bg-neutral-800/60">
+    <div class="border-b-2 border-primary-100 bg-primary-50 px-6 py-6 dark:border-primary-900 dark:bg-primary-900/40 sm:px-10">
+      <h2 class="m-0 text-2xl font-extrabold sm:text-3xl">
+        <a class="text-neutral-900 hover:text-primary-600 dark:text-neutral dark:hover:text-primary-400" href="{{ .RelPermalink }}">
+          {{ .Title | emojify }}
+        </a>
+      </h2>
+      <div class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
+        {{ partial "article-meta.html" (dict "context" . "scope" "list") }}
       </div>
-      <div class="prose max-w-none px-6 py-8 dark:prose-invert sm:px-10">
-        {{ $post.Content | emojify }}
-      </div>
-    </article>
-  {{ else }}
-    <p class="text-center text-neutral-500 dark:text-neutral-400">Noch keine Beiträge.</p>
-  {{ end }}
-</div>
+    </div>
+    <div class="prose max-w-none px-6 py-8 dark:prose-invert sm:px-10">
+      {{ .Content | emojify }}
+    </div>
+  </article>
+  <div class="mt-8 flex justify-center">
+    <a href="{{ "posts" | relURL }}" class="inline-flex items-center gap-1.5 rounded-full bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700">
+      Alle Beiträge lesen
+    </a>
+  </div>
+</section>
+{{ end }}
 
-{{ if gt (len $posts) 1 }}
+{{/* ---------- Map teaser ---------- */}}
+{{ if or (gt (len $pins.photoPins) 0) (gt (len $pins.postPins) 0) }}
+<section class="fade-in-up mb-8">
+  <div class="mb-6 text-center">
+    <h2 class="text-2xl font-extrabold sm:text-3xl">Wo ich schon war</h2>
+    <p class="mt-1 text-neutral-500 dark:text-neutral-400">{{ $placeCount }} Orte, direkt aus den GPS-Daten der Fotos.</p>
+  </div>
+  <a href="{{ "map" | relURL }}" class="group relative block h-64 overflow-hidden rounded-2xl border-2 border-primary-200 shadow-md dark:border-primary-800 sm:h-80">
+    <div id="mini-map" class="pointer-events-none h-full w-full"></div>
+    <div class="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-neutral-900/70 via-transparent to-transparent p-6">
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-sm font-semibold text-neutral-800 shadow-sm transition group-hover:bg-primary-50">
+        Zur vollständigen Karte
+      </span>
+    </div>
+  </a>
+</section>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 (function () {
-  var btn = document.getElementById("jump-to-oldest");
-  var target = document.getElementById("oldest-post");
-  if (btn && target) {
-    btn.addEventListener("click", function () {
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
+  var el = document.getElementById("mini-map");
+  if (!el || !window.L) return;
+  var map = L.map(el, { zoomControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false, touchZoom: false }).setView([38.7223, -9.1393], 6);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '' }).addTo(map);
+
+  var photoPins = {{ $pins.photoPins | jsonify | safeJS }};
+  var postPins = {{ $pins.postPins | jsonify | safeJS }};
+  var seen = {};
+  photoPins.concat(postPins).forEach(function (p) {
+    var key = p.lat.toFixed(3) + ',' + p.lon.toFixed(3);
+    if (seen[key]) return;
+    seen[key] = true;
+    L.circleMarker([p.lat, p.lon], { radius: 7, weight: 2, color: '#fff', fillColor: '#d85a2f', fillOpacity: 1 }).addTo(map);
+  });
+})();
+</script>
+{{ end }}
+
+<script>
+(function () {
+  /* Scroll progress bar */
+  var bar = document.getElementById("scroll-progress");
+  function updateProgress() {
+    var h = document.documentElement;
+    var scrolled = h.scrollTop / (h.scrollHeight - h.clientHeight || 1);
+    if (bar) bar.style.transform = "scaleX(" + Math.min(1, Math.max(0, scrolled)) + ")";
+  }
+  window.addEventListener("scroll", updateProgress, { passive: true });
+  updateProgress();
+
+  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* Hero mouse parallax */
+  var hero = document.getElementById("hero");
+  var heroParallax = document.getElementById("hero-parallax");
+  if (hero && heroParallax && !reduceMotion) {
+    hero.addEventListener("mousemove", function (e) {
+      var r = hero.getBoundingClientRect();
+      var x = (e.clientX - r.left) / r.width - 0.5;
+      var y = (e.clientY - r.top) / r.height - 0.5;
+      heroParallax.style.transform = "translate(" + (x * -14) + "px," + (y * -14) + "px)";
+    });
+    hero.addEventListener("mouseleave", function () {
+      heroParallax.style.transform = "";
+    });
+  }
+
+  /* Hero title easter egg: 3 quick clicks = confetti */
+  var title = document.getElementById("hero-title");
+  if (title && !reduceMotion) {
+    var clicks = [];
+    var colors = ["#d85a2f", "#1f809e", "#f2a65a", "#ffffff"];
+    title.addEventListener("click", function () {
+      var now = Date.now();
+      clicks = clicks.filter(function (t) { return now - t < 1200; });
+      clicks.push(now);
+      if (clicks.length >= 3) {
+        clicks = [];
+        var r = title.getBoundingClientRect();
+        for (var i = 0; i < 28; i++) {
+          var d = document.createElement("div");
+          var size = 6 + Math.random() * 8;
+          d.style.cssText = [
+            "position:fixed", "left:" + (r.left + r.width / 2) + "px", "top:" + (r.top + r.height / 2) + "px",
+            "width:" + size + "px", "height:" + size + "px", "background:" + colors[i % colors.length],
+            "border-radius:" + (Math.random() > 0.5 ? "50%" : "2px"), "pointer-events:none", "z-index:9999",
+            "transition:transform 1s cubic-bezier(.2,.8,.2,1), opacity 1s ease"
+          ].join(";");
+          document.body.appendChild(d);
+          (function (el) {
+            requestAnimationFrame(function () {
+              var angle = Math.random() * Math.PI * 2;
+              var dist = 80 + Math.random() * 160;
+              el.style.transform = "translate(" + Math.cos(angle) * dist + "px," + (Math.sin(angle) * dist + 60) + "px) rotate(" + (Math.random() * 480 - 240) + "deg)";
+              el.style.opacity = "0";
+            });
+          })(d);
+          setTimeout((function (el) { return function () { el.remove(); }; })(d), 1100);
+        }
+      }
+    });
+  }
+
+  /* Stat count-up on scroll into view */
+  var statEls = document.querySelectorAll(".stat-number");
+  if ("IntersectionObserver" in window && statEls.length) {
+    var statObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        statObserver.unobserve(entry.target);
+        var target = parseInt(entry.target.getAttribute("data-target"), 10) || 0;
+        if (reduceMotion || target === 0) { entry.target.textContent = target; return; }
+        var start = null;
+        var duration = 900;
+        function step(ts) {
+          if (!start) start = ts;
+          var progress = Math.min(1, (ts - start) / duration);
+          entry.target.textContent = Math.round(progress * target);
+          if (progress < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      });
+    }, { threshold: 0.4 });
+    statEls.forEach(function (el) { statObserver.observe(el); });
+  } else {
+    statEls.forEach(function (el) { el.textContent = el.getAttribute("data-target"); });
+  }
+
+  /* Pinned moments story: activate slide by scroll position within the section */
+  var momentsSection = document.getElementById("moments");
+  if (momentsSection) {
+    var slides = Array.prototype.slice.call(momentsSection.querySelectorAll(".moment-slide"));
+    var dots = Array.prototype.slice.call(momentsSection.querySelectorAll(".moment-dot"));
+    var n = slides.length;
+
+    function updateMoments() {
+      var rect = momentsSection.getBoundingClientRect();
+      var total = rect.height - window.innerHeight;
+      var progress = total > 0 ? (-rect.top) / total : 0;
+      progress = Math.min(1, Math.max(0, progress));
+      var active = Math.min(n - 1, Math.floor(progress * n));
+      slides.forEach(function (s, i) {
+        s.style.opacity = i === active ? "1" : "0";
+        s.style.pointerEvents = i === active ? "auto" : "none";
+      });
+      dots.forEach(function (d, i) {
+        d.classList.toggle("bg-white", i === active);
+        d.classList.toggle("w-10", i === active);
+        d.classList.toggle("bg-white/30", i !== active);
+      });
+    }
+    window.addEventListener("scroll", updateMoments, { passive: true });
+    window.addEventListener("resize", updateMoments);
+    updateMoments();
+  }
+
+  /* Subtle tilt on moment images */
+  if (!reduceMotion) {
+    document.querySelectorAll(".moment-tilt").forEach(function (img) {
+      var wrap = img.closest(".moment-slide");
+      wrap.addEventListener("mousemove", function (e) {
+        var r = wrap.getBoundingClientRect();
+        var x = (e.clientX - r.left) / r.width - 0.5;
+        var y = (e.clientY - r.top) / r.height - 0.5;
+        img.style.transform = "scale(1.03) rotate(" + (x * 1.2) + "deg) translate(" + (x * -6) + "px," + (y * -6) + "px)";
+      });
+      wrap.addEventListener("mouseleave", function () { img.style.transform = ""; });
     });
   }
 })();
 </script>
-{{ end }}
