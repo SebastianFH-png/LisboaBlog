@@ -37,7 +37,7 @@
 <div id="scroll-progress" class="fixed inset-x-0 top-0 z-50 h-1 origin-left scale-x-0 bg-primary-500"></div>
 
 {{/* ---------- Hero ---------- */}}
-<header id="hero" class="hero-banner relative -mt-6 mb-4 overflow-hidden text-center text-white sm:-mt-10">
+<header id="hero" class="hero-banner relative -mt-6 mb-4 overflow-hidden text-center text-neutral-50 sm:-mt-10">
   {{ with $hero }}
     <div id="hero-parallax" class="absolute -inset-6">
       <img src="{{ .RelPermalink }}" alt="" class="hero-banner-img h-full w-full object-cover" loading="eager">
@@ -49,32 +49,23 @@
       {{ site.Title | emojify }}
     </h1>
     {{ with site.Params.author.headline }}
-      <p class="hero-text-shadow mx-auto mt-6 max-w-xl text-lg text-white/95 sm:text-xl">{{ . | emojify }}</p>
+      <p class="hero-text-shadow mx-auto mt-6 max-w-xl text-lg text-neutral-50/95 sm:text-xl">{{ . | emojify }}</p>
     {{ end }}
-    <a href="#story" class="scroll-cue mt-14 text-white/80 transition hover:text-white" aria-label="Runterscrollen">
+    <a href="#stats" class="scroll-cue mt-14 text-neutral-50/80 transition hover:text-neutral-50" aria-label="Runterscrollen">
       {{ partial "icon.html" "chevron-down" }}
     </a>
   </div>
 </header>
 
-{{/* ---------- Big scroll-driven statement ---------- */}}
-<section id="story" class="reveal-rotate relative my-28 px-6 text-center sm:my-40">
-  <p class="mx-auto max-w-4xl text-4xl font-extrabold uppercase leading-[1.05] tracking-tight text-neutral-900 dark:text-neutral sm:text-6xl md:text-7xl">
-    {{ $dayCount }} Tage. {{ $photoCount }} Fotos.<br>
-    <span class="text-primary-600 dark:text-primary-400">Ein Semester in Lissabon.</span>
-  </p>
-</section>
-
 {{/* ---------- Stats strip ---------- */}}
-<section class="mx-auto mb-28 grid max-w-4xl grid-cols-2 gap-4 px-2 sm:grid-cols-4 sm:gap-6">
+<section id="stats" class="mx-auto mb-28 mt-28 grid max-w-3xl grid-cols-3 gap-4 px-2 sm:mt-40 sm:gap-6">
   {{ $stats := slice
     (dict "value" $dayCount "label" "Tage vor Ort")
     (dict "value" (len $posts) "label" "Beiträge")
     (dict "value" $photoCount "label" "Fotos")
-    (dict "value" $placeCount "label" "Orte auf der Karte")
   }}
   {{ range $i, $s := $stats }}
-  <div class="reveal-pop tilt-card rounded-2xl border-2 border-primary-100 bg-white px-3 py-8 text-center shadow-sm transition-shadow hover:shadow-lg dark:border-primary-900 dark:bg-neutral-800/60" style="transition-delay: {{ mul $i 80 }}ms">
+  <div class="reveal-pop tilt-card rounded-2xl border-2 border-primary-100 bg-neutral px-3 py-8 text-center shadow-sm transition-shadow hover:shadow-lg dark:border-primary-900 dark:bg-neutral-800/60" style="transition-delay: {{ mul $i 80 }}ms">
     <div class="stat-number text-4xl font-extrabold text-primary-600 dark:text-primary-400 sm:text-5xl" data-target="{{ $s.value }}">0</div>
     <div class="mt-1 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400 sm:text-sm">{{ $s.label }}</div>
   </div>
@@ -87,7 +78,7 @@
   <div class="mb-6 text-center">
     <span class="text-xs font-semibold uppercase tracking-widest text-primary-500">Neuester Beitrag</span>
   </div>
-  <article class="tilt-card overflow-hidden rounded-2xl border-2 border-primary-200 bg-white shadow-md transition-shadow hover:shadow-xl dark:border-primary-800 dark:bg-neutral-800/60">
+  <article class="tilt-card overflow-hidden rounded-2xl border-2 border-primary-200 bg-neutral shadow-md transition-shadow hover:shadow-xl dark:border-primary-800 dark:bg-neutral-800/60">
     <div class="border-b-2 border-primary-100 bg-primary-50 px-6 py-6 dark:border-primary-900 dark:bg-primary-900/40 sm:px-10">
       <h2 class="m-0 text-2xl font-extrabold sm:text-3xl">
         <a class="text-neutral-900 hover:text-primary-600 dark:text-neutral dark:hover:text-primary-400" href="{{ .RelPermalink }}">
@@ -103,7 +94,7 @@
     </div>
   </article>
   <div class="mt-8 flex justify-center">
-    <a href="{{ "posts" | relURL }}" class="magnetic-btn inline-flex items-center gap-1.5 rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700">
+    <a href="{{ "posts" | relURL }}" class="magnetic-btn inline-flex items-center gap-1.5 rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-neutral-50 shadow-sm transition hover:bg-primary-700">
       Alle Beiträge lesen
     </a>
   </div>
@@ -120,7 +111,7 @@
   <a href="{{ "map" | relURL }}" class="tilt-card group relative block h-64 overflow-hidden rounded-2xl border-2 border-primary-200 shadow-md transition-shadow hover:shadow-xl dark:border-primary-800 sm:h-80">
     <div id="mini-map" class="pointer-events-none h-full w-full transition-transform duration-500 group-hover:scale-105"></div>
     <div class="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-neutral-900/70 via-transparent to-transparent p-6">
-      <span class="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-sm font-semibold text-neutral-800 shadow-sm transition group-hover:bg-primary-50">
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-neutral px-4 py-2 text-sm font-semibold text-neutral-800 shadow-sm transition group-hover:bg-primary-50">
         Zur vollständigen Karte
       </span>
     </div>
@@ -259,28 +250,13 @@
         }
       });
     }, { threshold: 0.2 });
-    document.querySelectorAll(".reveal-pop, .reveal-rotate").forEach(function (el) {
+    document.querySelectorAll(".reveal-pop").forEach(function (el) {
       revealObserver.observe(el);
     });
   } else {
-    document.querySelectorAll(".reveal-pop, .reveal-rotate").forEach(function (el) {
+    document.querySelectorAll(".reveal-pop").forEach(function (el) {
       el.classList.add("is-revealed");
     });
-  }
-
-  /* Continuous scroll-driven scale on the big statement */
-  var story = document.getElementById("story");
-  if (story && !reduceMotion) {
-    function updateStory() {
-      var r = story.getBoundingClientRect();
-      var vh = window.innerHeight;
-      var center = r.top + r.height / 2;
-      var dist = Math.abs(center - vh / 2) / vh;
-      var scale = Math.max(0.85, 1 - dist * 0.3);
-      story.style.setProperty("--story-scale", scale.toFixed(3));
-    }
-    window.addEventListener("scroll", function () { requestAnimationFrame(updateStory); }, { passive: true });
-    updateStory();
   }
 
   /* Tilt + lift on any card marked .tilt-card */
