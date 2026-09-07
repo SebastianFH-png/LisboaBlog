@@ -1,22 +1,44 @@
-{{ $images := .Page.Resources.ByType "image" }}
+{{ $page := .Page }}
+{{ $images := $page.Resources.ByType "image" }}
 {{ if gt (len $images) 0 }}
+{{ $id := printf "gallery-%s" (substr (md5 (printf "%s%d" $page.RelPermalink .Ordinal)) 0 8) }}
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.3.1/css/glightbox.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.3.1/js/glightbox.min.js"></script>
 
-<div class="my-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+<div id="{{ $id }}" class="my-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
   {{ range $images }}
   {{ $thumb := .Resize "500x webp q75" }}
   {{ $full := .Resize "2000x webp q80" }}
   {{ if gt .Height .Width }}
     {{ $full = .Resize "x2000 webp q80" }}
   {{ end }}
-  <a href="{{ $full.RelPermalink }}" class="glightbox block overflow-hidden rounded-lg" data-gallery="page-gallery">
+  {{ $photoSlug := path.BaseName .Name | lower }}
+  <a
+    id="photo-{{ $page.File.ContentBaseName | lower }}-{{ $photoSlug }}"
+    href="{{ $full.RelPermalink }}"
+    class="{{ $id }}-glightbox block overflow-hidden rounded-lg"
+    data-gallery="{{ $id }}"
+  >
     <img src="{{ $thumb.RelPermalink }}" loading="lazy" class="h-full w-full object-cover transition duration-300 hover:scale-105" alt="{{ .Params.alt | default "" }}">
   </a>
   {{ end }}
 </div>
 
 <script>
-  if (window.GLightbox) { GLightbox({ selector: '.glightbox' }); }
+(function () {
+  var root = document.getElementById("{{ $id }}");
+  if (!root) return;
+  if (window.GLightbox) { GLightbox({ selector: ".{{ $id }}-glightbox" }); }
+
+  if (window.location.hash) {
+    var linked = null;
+    try { linked = root.querySelector(window.location.hash); } catch (e) {}
+    if (linked) {
+      linked.scrollIntoView({ behavior: "smooth", block: "center" });
+      setTimeout(function () { linked.click(); }, 400);
+    }
+  }
+})();
 </script>
 {{ end }}

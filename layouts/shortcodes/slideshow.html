@@ -1,6 +1,7 @@
-{{ $images := .Page.Resources.ByType "image" }}
+{{ $page := .Page }}
+{{ $images := $page.Resources.ByType "image" }}
 {{ if gt (len $images) 0 }}
-{{ $id := printf "slideshow-%s" (substr (md5 (printf "%s%d" .Page.RelPermalink .Ordinal)) 0 8) }}
+{{ $id := printf "slideshow-%s" (substr (md5 (printf "%s%d" $page.RelPermalink .Ordinal)) 0 8) }}
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.3.1/css/glightbox.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.3.1/js/glightbox.min.js"></script>
@@ -13,9 +14,11 @@
     {{ if gt $img.Height $img.Width }}
       {{ $full = $img.Resize "x2000 webp q80" }}
     {{ end }}
+    {{ $photoSlug := path.BaseName $img.Name | lower }}
     <a
+      id="photo-{{ $page.File.ContentBaseName | lower }}-{{ $photoSlug }}"
       href="{{ $full.RelPermalink }}"
-      class="{{ $id }}-glightbox group relative h-full max-w-[92%] flex-none snap-center overflow-hidden rounded-2xl border-2 border-primary-200 shadow-md dark:border-primary-800 sm:max-w-[80%]"
+      class="{{ $id }}-glightbox group relative h-full max-w-[92%] flex-none scroll-mx-4 snap-center overflow-hidden rounded-2xl border-2 border-primary-200 shadow-md dark:border-primary-800 sm:max-w-[80%]"
       data-gallery="{{ $id }}"
     >
       <img
@@ -101,6 +104,15 @@
 
   setActive(0);
   if (window.GLightbox) { GLightbox({ selector: ".{{ $id }}-glightbox" }); }
+
+  if (window.location.hash) {
+    var linked = null;
+    try { linked = root.querySelector(window.location.hash); } catch (e) {}
+    if (linked) {
+      linked.scrollIntoView({ behavior: "smooth", inline: "center", block: "center" });
+      setTimeout(function () { linked.click(); }, 400);
+    }
+  }
 })();
 </script>
 
