@@ -35,3 +35,7 @@ echo "Text in VS Code schreiben, Fotos in die Inbox ziehen, dann 'publish' ausfÃ
 if command -v code >/dev/null 2>&1; then
   code "$REPO_ROOT/$POST_DIR/index.md"
 fi
+
+if command -v xdg-open >/dev/null 2>&1; then
+  xdg-open "$REPO_ROOT/$INBOX_DIR" >/dev/null 2>&1 &
+fi
