@@ -29,8 +29,6 @@
 {{ $dayCount := int (div (now.Sub $firstDate).Hours 24) }}
 {{ if lt $dayCount 1 }}{{ $dayCount = 1 }}{{ end }}
 
-<div id="cursor-glow" class="pointer-events-none fixed left-0 top-0 z-0 h-[32rem] w-[32rem] rounded-full opacity-0 blur-3xl transition-opacity duration-700"></div>
-
 <div id="scroll-progress" class="fixed inset-x-0 top-0 z-50 h-1 origin-left scale-x-0 bg-primary-500"></div>
 
 {{/* ---------- Hero ---------- */}}
@@ -157,16 +155,6 @@
   }
   window.addEventListener("scroll", updateProgress, { passive: true });
   updateProgress();
-
-  /* Ambient cursor glow, whole page */
-  var glow = document.getElementById("cursor-glow");
-  if (glow && !reduceMotion) {
-    var shown = false;
-    window.addEventListener("mousemove", function (e) {
-      glow.style.transform = "translate(" + (e.pageX - 256) + "px," + (e.pageY - 256) + "px)";
-      if (!shown) { shown = true; glow.style.opacity = "1"; }
-    }, { passive: true });
-  }
 
   /* Hero mouse parallax */
   var hero = document.getElementById("hero");

@@ -1,9 +1,23 @@
+<div id="cursor-glow" class="pointer-events-none fixed left-0 top-0 z-0 h-[32rem] w-[32rem] rounded-full opacity-0 blur-3xl transition-opacity duration-700"></div>
+
 <script>
 (function () {
+  var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
   var header = document.getElementById("site-header");
   if (header) {
     window.addEventListener("scroll", function () {
       header.classList.toggle("is-scrolled", window.scrollY > 8);
+    }, { passive: true });
+  }
+
+  /* Ambient cursor glow, whole site */
+  var glow = document.getElementById("cursor-glow");
+  if (glow && !reduceMotion) {
+    var shown = false;
+    window.addEventListener("mousemove", function (e) {
+      glow.style.transform = "translate(" + (e.pageX - 256) + "px," + (e.pageY - 256) + "px)";
+      if (!shown) { shown = true; glow.style.opacity = "1"; }
     }, { passive: true });
   }
 
