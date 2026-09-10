@@ -26,8 +26,9 @@
 {{ end }}
 
 {{ $dayCount := 0 }}
+{{ $firstDate := time.Now }}
 {{ if gt (len $posts) 0 }}
-  {{ $firstDate := (index $posts (sub (len $posts) 1)).Date }}
+  {{ $firstDate = (index $posts (sub (len $posts) 1)).Date }}
   {{ $dayCount = int (div (now.Sub $firstDate).Hours 24) }}
   {{ if lt $dayCount 1 }}{{ $dayCount = 1 }}{{ end }}
 {{ end }}
@@ -67,13 +68,13 @@
 {{/* ---------- Stats strip ---------- */}}
 <section id="stats" class="mx-auto mb-28 grid max-w-3xl grid-cols-3 gap-4 px-2 sm:gap-6">
   {{ $stats := slice
-    (dict "value" $dayCount "label" "Tage vor Ort")
+    (dict "value" $dayCount "label" "Tage vor Ort" "since" ($firstDate.Format "2006-01-02T15:04:05Z07:00"))
     (dict "value" (len $posts) "label" "Beiträge")
     (dict "value" $photoCount "label" "Fotos")
   }}
   {{ range $i, $s := $stats }}
   <div class="reveal-pop tilt-card rounded-2xl border-2 border-primary-100 bg-neutral px-3 py-8 text-center shadow-sm transition-shadow hover:shadow-lg dark:border-primary-900 dark:bg-neutral-800/60" style="transition-delay: {{ mul $i 80 }}ms">
-    <div class="stat-number text-4xl font-extrabold text-primary-600 dark:text-primary-400 sm:text-5xl" data-target="{{ $s.value }}">0</div>
+    <div class="stat-number text-4xl font-extrabold text-primary-600 dark:text-primary-400 sm:text-5xl" data-target="{{ $s.value }}"{{ with $s.since }} data-since="{{ . }}"{{ end }}>0</div>
     <div class="mt-1 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400 sm:text-sm">{{ $s.label }}</div>
   </div>
   {{ end }}
@@ -224,6 +225,14 @@
 
   /* Stat count-up on scroll into view */
   var statEls = document.querySelectorAll(".stat-number");
+  statEls.forEach(function (el) {
+    var since = el.getAttribute("data-since");
+    if (!since) return;
+    var sinceDate = new Date(since);
+    if (isNaN(sinceDate.getTime())) return;
+    var days = Math.floor((Date.now() - sinceDate.getTime()) / 86400000);
+    el.setAttribute("data-target", Math.max(1, days));
+  });
   if ("IntersectionObserver" in window && statEls.length) {
     var statObserver = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
