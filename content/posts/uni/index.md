@@ -9,6 +9,6 @@ lon: 0.0
 location: ""
 ---
 
-Die Universität (Instituto Superior Tecnico die ich) hat einen coolen Campus, bei dem es verschiedene Gebäude für unterschiedliche Studienrichtungen gibt. Nachdem ich in den bisherigen Tagen fast ausschließlich anderen Erasmus Studenten begegnet bin, habe ich hier nun erstmals einheimische Studierende kennen gelernt. Es gibt außerdem Sportplätze, die von den Studierenden gerne genutzt werden. Dort habe ich diese Woche das erste Mal Paddel gespielt, was mir sehr Spaß gemacht hat und ich hier vermutlich noch öfters machen werde.
+Die Universität (Instituto Superior Tecnico) die ich besuche, hat einen coolen Campus, bei dem es verschiedene Gebäude für unterschiedliche Studienrichtungen gibt. Nachdem ich in den bisherigen Tagen fast ausschließlich anderen Erasmus Studenten begegnet bin, habe ich hier nun erstmals einheimische Studierende kennen gelernt. Es gibt außerdem Sportplätze, die von den Studierenden gerne genutzt werden. Dort habe ich diese Woche das erste Mal Paddel gespielt, was mir sehr Spaß gemacht hat und ich hier vermutlich noch öfters machen werde.
 
 {{< slideshow >}}

@@ -6,7 +6,7 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
 echo "==> Hole Remote-Änderungen (pull --rebase)"
-git pull --rebase
+git pull --rebase --autostash
 
 CHANGED_SLUGS=()
 
