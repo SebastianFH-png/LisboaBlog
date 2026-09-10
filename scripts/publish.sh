@@ -5,6 +5,9 @@ shopt -s nullglob nocaseglob
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
+echo "==> Hole Remote-Änderungen (pull --rebase)"
+git pull --rebase
+
 CHANGED_SLUGS=()
 
 if [ -d "_inbox" ]; then
