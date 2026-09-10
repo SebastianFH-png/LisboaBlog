@@ -25,12 +25,9 @@
   {{ $photoCount = add $photoCount (len (.Resources.ByType "image")) }}
 {{ end }}
 
-{{ $dayCount := 0 }}
-{{ if gt (len $posts) 0 }}
-  {{ $firstDate := (index $posts (sub (len $posts) 1)).Date }}
-  {{ $dayCount = int (div (now.Sub $firstDate).Hours 24) }}
-  {{ if lt $dayCount 1 }}{{ $dayCount = 1 }}{{ end }}
-{{ end }}
+{{ $firstDate := time.AsTime "2026-09-01T00:00:00+01:00" }}
+{{ $dayCount := int (div (now.Sub $firstDate).Hours 24) }}
+{{ if lt $dayCount 1 }}{{ $dayCount = 1 }}{{ end }}
 
 <div id="cursor-glow" class="pointer-events-none fixed left-0 top-0 z-0 h-[32rem] w-[32rem] rounded-full opacity-0 blur-3xl transition-opacity duration-700"></div>
 
