@@ -5,6 +5,7 @@
 colorScheme = "lisboa"
 defaultAppearance = "light" # valid options: light or dark
 autoSwitchAppearance = false
+defaultThemeColor = "#1f809e"
 
 enableSearch = true
 enableCodeCopy = true
