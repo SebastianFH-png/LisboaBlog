@@ -4,12 +4,18 @@
   position: sticky;
   top: 0;
   z-index: 40;
+  transition: box-shadow 0.2s ease;
+}
+.site-header-sticky::before {
+  content: "";
+  position: absolute;
+  inset: 0 calc(50% - 50vw);
+  z-index: -1;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   background-color: rgba(var(--color-neutral), 0.8);
-  transition: box-shadow 0.2s ease;
 }
-.dark .site-header-sticky {
+.dark .site-header-sticky::before {
   background-color: rgba(var(--color-neutral-800), 0.8);
 }
 .site-header-sticky.is-scrolled {
