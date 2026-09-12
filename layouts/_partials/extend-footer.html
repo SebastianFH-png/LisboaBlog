@@ -7,7 +7,7 @@
   if (glow && !reduceMotion) {
     var shown = false;
     window.addEventListener("mousemove", function (e) {
-      glow.style.transform = "translate(" + (e.pageX - 256) + "px," + (e.pageY - 256) + "px)";
+      glow.style.transform = "translate(" + (e.clientX - 256) + "px," + (e.clientY - 256) + "px)";
       if (!shown) { shown = true; glow.style.opacity = "1"; }
     }, { passive: true });
   }
