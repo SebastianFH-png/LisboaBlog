@@ -5,7 +5,7 @@
     <button
       type="button"
       id="jump-to-oldest"
-      class="inline-flex items-center gap-1.5 rounded-full border border-primary-200 bg-neutral px-4 py-2 text-sm font-semibold text-neutral-700 shadow-sm transition hover:border-primary-400 hover:text-primary-600 dark:border-primary-800 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:text-primary-400"
+      class="neu-btn inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-semibold text-neutral-700 hover:text-primary-600 dark:text-neutral-300 dark:hover:text-primary-400"
     >
       Zum ältesten Beitrag
       {{ partial "icon.html" "chevron-down" }}
@@ -13,20 +13,25 @@
   </div>
 {{ end }}
 
-<div class="flex flex-col gap-16">
+<div id="post-feed" class="flex flex-col gap-20 pt-4">
   {{ range $i, $post := $posts }}
-    <article {{ if eq $i (sub (len $posts) 1) }}id="oldest-post"{{ end }} class="fade-in-up overflow-hidden rounded-3xl border border-neutral-200 bg-neutral shadow-card dark:border-neutral-700 dark:bg-neutral-800/60">
-      <div class="border-b border-primary-100 bg-primary-50/70 px-5 py-5 dark:border-primary-900/60 dark:bg-primary-900/30 sm:px-10 sm:py-6">
-        <h2 class="m-0 text-2xl font-extrabold sm:text-3xl">
-          <a class="text-neutral-900 hover:text-primary-600 dark:text-neutral dark:hover:text-primary-400" href="{{ $post.RelPermalink }}">
-            {{ $post.Title | emojify }}
-          </a>
-        </h2>
-        <div class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
-          {{ partial "article-meta.html" (dict "context" $post "scope" "list") }}
+    <article {{ if eq $i (sub (len $posts) 1) }}id="oldest-post"{{ end }} class="postcard fade-in-up">
+      <span class="washi washi-tl" aria-hidden="true"></span>
+      <span class="washi washi-tr" aria-hidden="true"></span>
+      <div class="postcard-head flex items-start justify-between gap-4 px-5 pb-5 pt-9 sm:px-10 sm:pt-11">
+        <div class="min-w-0">
+          <h2 class="m-0 text-2xl font-extrabold sm:text-3xl">
+            <a class="text-neutral-900 hover:text-primary-600 dark:text-neutral dark:hover:text-primary-400" href="{{ $post.RelPermalink }}">
+              {{ $post.Title | emojify }}
+            </a>
+          </h2>
+          <div class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
+            {{ partial "article-meta.html" (dict "context" $post "scope" "list") }}
+          </div>
         </div>
+        {{ partial "deco/postmark.html" $post }}
       </div>
-      <div class="prose max-w-none px-5 py-7 dark:prose-invert sm:px-10 sm:py-8">
+      <div class="prose max-w-none px-5 pb-8 pt-6 dark:prose-invert sm:px-10 sm:pb-10">
         {{ $post.Content | emojify }}
       </div>
     </article>
@@ -34,6 +39,120 @@
     <p class="text-center text-neutral-500 dark:text-neutral-400">Noch keine Beiträge.</p>
   {{ end }}
 </div>
+
+<script>
+/* Magnetic scrolling: a flick (finger still moving on release) glides on to the next stop,
+   a controlled stop stays put. Mouse wheel: fast scrolling counts as a flick. */
+(function () {
+  var cards = document.querySelectorAll("#post-feed > .postcard");
+  if (!cards.length) return;
+  var FAST = 1.8;        // px per ms, peak wheel scroll speed that counts as a flick
+  var FLICK = 0.4;       // px per ms, finger speed at release that counts as a flick
+  var SLOW_RANGE = 0.12; // slow scrolling only settles this close to a post start (share of viewport)
+  var FAST_RANGE = 1;    // a flick never jumps further than one viewport
+  var tracks = document.querySelectorAll("#post-feed .slideshow-track");
+  var timer = null;
+  var snapping = false;
+  var gestureStartY = null;
+  var lastY = window.scrollY;
+  var lastT = performance.now();
+  var peak = 0;
+  var touchGesture = false;
+  var touchFlick = false;
+  var touchSamples = [];
+
+  window.addEventListener("touchstart", function (e) {
+    touchGesture = true;
+    touchFlick = false;
+    touchSamples = [{ t: performance.now(), y: e.touches[0].clientY }];
+  }, { passive: true });
+  window.addEventListener("touchmove", function (e) {
+    var now = performance.now();
+    touchSamples.push({ t: now, y: e.touches[0].clientY });
+    while (touchSamples.length > 2 && now - touchSamples[0].t > 100) touchSamples.shift();
+  }, { passive: true });
+  window.addEventListener("wheel", function () { touchGesture = false; }, { passive: true });
+  window.addEventListener("touchend", function () {
+    var now = performance.now();
+    var first = touchSamples[0];
+    var last = touchSamples[touchSamples.length - 1];
+    // finger rested before lifting: no flick
+    if (!first || now - last.t > 60 || last.t === first.t) { touchFlick = false; return; }
+    touchFlick = Math.abs(last.y - first.y) / (last.t - first.t) >= FLICK;
+  }, { passive: true });
+
+  // Don't pull away while the reader is looking at a slideshow
+  function viewingPhotos(vh) {
+    return Array.prototype.some.call(tracks, function (t) {
+      var r = t.getBoundingClientRect();
+      var visible = Math.min(r.bottom, vh) - Math.max(r.top, 0);
+      return visible > r.height * 0.6;
+    });
+  }
+
+  function onScroll() {
+    if (snapping) return;
+    var now = performance.now();
+    var y = window.scrollY;
+    if (gestureStartY === null) gestureStartY = y;
+    if (now - lastT >= 40) {
+      peak = Math.max(peak, Math.abs(y - lastY) / (now - lastT));
+      lastY = y;
+      lastT = now;
+    }
+  }
+
+  function snap() {
+    if (snapping) { snapping = false; return; }
+    var vh = window.innerHeight;
+    var dir = gestureStartY === null ? 0 : Math.sign(window.scrollY - gestureStartY);
+    var fast = touchGesture ? touchFlick : peak >= FAST;
+    touchGesture = false;
+    touchFlick = false;
+    gestureStartY = null;
+    peak = 0;
+    lastY = window.scrollY;
+    lastT = performance.now();
+    if (!fast && viewingPhotos(vh)) return;
+
+    // stops: each post start (below the header) and each slideshow (centered on screen)
+    var stops = [];
+    cards.forEach(function (card) {
+      var offset = parseFloat(getComputedStyle(card).scrollMarginTop) || 0;
+      stops.push({ delta: card.getBoundingClientRect().top - offset, photos: false });
+    });
+    tracks.forEach(function (t) {
+      var r = t.parentElement.getBoundingClientRect();
+      stops.push({ delta: r.top + r.height / 2 - vh / 2, photos: true });
+    });
+
+    var best = null;
+    stops.forEach(function (stop) {
+      var delta = stop.delta;
+      if (fast) {
+        // next post start ahead in the scroll direction
+        if (dir === 0 || delta * dir <= 2 || Math.abs(delta) > vh * FAST_RANGE) return;
+      } else if (stop.photos || Math.abs(delta) >= vh * SLOW_RANGE) {
+        return;
+      }
+      if (best === null || Math.abs(delta) < Math.abs(best)) best = delta;
+    });
+    if (best === null || Math.abs(best) < 2) return;
+    snapping = true;
+    window.scrollBy({ top: best, behavior: "smooth" });
+  }
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+  if ("onscrollend" in window) {
+    window.addEventListener("scrollend", snap);
+  } else {
+    window.addEventListener("scroll", function () {
+      clearTimeout(timer);
+      timer = setTimeout(snap, 150);
+    }, { passive: true });
+  }
+})();
+</script>
 
 {{ if gt (len $posts) 1 }}
 <script>

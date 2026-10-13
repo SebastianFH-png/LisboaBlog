@@ -1,0 +1,5 @@
+{{/* Round postmark stamp for a post card: place (or "Correio") on top, date in the middle */}}
+<div class="postmark" aria-hidden="true">
+  <span class="postmark-place">{{ .Params.location | default "Correio" | upper }}</span>
+  <span class="postmark-date">{{ .Date | time.Format "02.01.06" }}</span>
+</div>

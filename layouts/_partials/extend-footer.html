@@ -1,14 +1,18 @@
-<div id="cursor-glow" class="pointer-events-none fixed left-0 top-0 z-0 h-[32rem] w-[32rem] rounded-full opacity-0 blur-3xl transition-opacity duration-700"></div>
+<div id="cursor-glow" class="pointer-events-none fixed left-0 top-0 z-0 h-40 w-40 rounded-full opacity-0 blur-xl transition-opacity duration-700"></div>
 
 <script>
 (function () {
   var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var glow = document.getElementById("cursor-glow");
   if (glow && !reduceMotion) {
-    var shown = false;
+    var visible = false;
     window.addEventListener("mousemove", function (e) {
-      glow.style.transform = "translate(" + (e.clientX - 256) + "px," + (e.clientY - 256) + "px)";
-      if (!shown) { shown = true; glow.style.opacity = "1"; }
+      glow.style.transform = "translate(" + (e.clientX - 80) + "px," + (e.clientY - 80) + "px)";
+      // hide the glow over photos and maps so it doesn't tint them
+      var overImage = e.target.closest && e.target.closest("img, picture, .polaroid, .cork-photo, #hero, .leaflet-container, #mini-map");
+      if (visible === !overImage) return;
+      visible = !overImage;
+      glow.style.opacity = visible ? "1" : "0";
     }, { passive: true });
   }
 })();
@@ -23,7 +27,10 @@
     }, { passive: true });
   }
 
-  var targets = document.querySelectorAll("article h2, article p, article figure, article img, .fade-in-up");
+  var targets = Array.prototype.filter.call(
+    document.querySelectorAll("article h2, article p, article figure, article img, .fade-in-up"),
+    function (el) { return !el.closest(".cork-wall"); }
+  );
   if ("IntersectionObserver" in window && targets.length) {
     targets.forEach(function (el) { el.classList.add("fade-in-up"); });
     var observer = new IntersectionObserver(function (entries) {

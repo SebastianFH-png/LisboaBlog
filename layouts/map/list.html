@@ -1,14 +1,76 @@
 {{ define "main" }}
 <article class="max-w-none">
-  <h1 class="mb-6 text-3xl font-extrabold">{{ .Title }}</h1>
+  <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+    <h1 class="text-3xl font-extrabold">{{ .Title }}</h1>
+    <div class="lever-ctl">
+      <span class="lever-label lever-label-map">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Zm0 0v14m6-12v14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        Karte
+      </span>
+      <button
+        type="button"
+        id="view-lever"
+        class="lever"
+        role="switch"
+        aria-checked="false"
+        aria-label="Pinnwand anzeigen"
+      >
+        <span class="lever-base" aria-hidden="true">
+          <span class="lever-led lever-led-map"></span>
+          <span class="lever-led lever-led-wall"></span>
+        </span>
+        <span class="lever-arm" aria-hidden="true"><span class="lever-knob"></span></span>
+        <span class="lever-hub" aria-hidden="true"></span>
+      </button>
+      <span class="lever-label lever-label-wall">
+        Pinnwand
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+      </span>
+    </div>
+  </div>
   {{ .Content }}
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.3.1/css/glightbox.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.3.1/js/glightbox.min.js"></script>
 
-  <div id="travel-map" class="my-6 h-[32rem] w-full rounded-lg overflow-hidden"></div>
+  <div id="travel-map" class="my-6 h-[32rem] w-full overflow-hidden rounded-lg"></div>
+
+  {{/* ---------- Cork board: every photo of every post, grouped by post ---------- */}}
+  {{ $posts := (where site.RegularPages "Section" "posts").ByDate.Reverse }}
+  <div id="cork-wall" class="cork-wall my-6" hidden>
+    {{ range $posts }}
+      {{ $post := . }}
+      {{ $images := $post.Resources.ByType "image" }}
+      {{ if $images }}
+        <section class="cork-group">
+          <a class="cork-note" href="{{ $post.RelPermalink }}">
+            <span class="cork-note-title">{{ $post.Title | emojify }}</span>
+            <span class="cork-note-date">{{ $post.Date | time.Format ":date_medium" }}</span>
+          </a>
+          {{ range $images }}
+            {{ $thumb := .Resize "320x webp q70" }}
+            {{ $full := .Resize "2000x webp q80" }}
+            {{ if gt .Height .Width }}
+              {{ $full = .Resize "x2000 webp q80" }}
+            {{ end }}
+            <a
+              href="{{ $full.RelPermalink }}"
+              class="cork-photo cork-glightbox"
+              data-gallery="cork"
+              data-seed="{{ $post.RelPermalink }}{{ .Name }}"
+            >
+              <img src="{{ $thumb.RelPermalink }}" width="{{ $thumb.Width }}" height="{{ $thumb.Height }}" loading="lazy" alt="{{ .Params.alt | default "" }}">
+            </a>
+          {{ end }}
+        </section>
+      {{ end }}
+    {{ end }}
+  </div>
 
   {{ $pins := partial "gps-pins.html" . }}
 
@@ -33,26 +95,127 @@
       groups[key].postURLs[p.postURL] = true;
     });
 
-    Object.keys(groups).forEach(function (key) {
-      var group = groups[key];
-      var cover = group.photos[0];
+    // Zero-size anchor at the photo's location; the visible pin is centered on it and sized
+    // by the --pin-size variable on the map, so all pins resize together and smoothly
+    function pinIcon(group) {
       var count = group.photos.length;
       var html =
         '<div class="photo-pin">' +
-          '<img src="' + cover.thumb + '" alt="">' +
+          '<img src="' + group.photos[0].thumb + '" alt="">' +
           (count > 1 ? '<span class="photo-pin-count">' + count + '</span>' : '') +
         '</div>';
-      var icon = L.divIcon({ html: html, className: 'photo-pin-wrapper', iconSize: [52, 52] });
+      return L.divIcon({ html: html, className: 'photo-pin-wrapper', iconSize: [0, 0] });
+    }
 
-      L.marker([group.lat, group.lon], { icon: icon }).addTo(map).on('click', function () {
-        var lightbox = GLightbox({
-          elements: group.photos.map(function (p) {
-            return { href: p.full, type: 'image' };
-          })
-        });
-        lightbox.open();
+    var groupList = Object.keys(groups).map(function (k) { return groups[k]; });
+    groupList.forEach(function (group) {
+      group.latlng = L.latLng(group.lat, group.lon);
+      group.marker = L.marker(group.latlng, { icon: pinIcon(group) }).addTo(map).on('click', function () {
+        hidePreview();
+        openOrZoom(group);
       });
+      group.marker.on('mouseover mousemove', function (e) { schedulePreview(group, e.originalEvent); });
+      group.marker.on('mouseout', hidePreview);
     });
+
+    // One size for every pin in view: as big as the tightest gap between visible pins allows,
+    // capped by zoom level
+    var pinSize = 48;
+    function resizePins() {
+      var z = map.getZoom();
+      var cap = z >= 16 ? 120 : z >= 14 ? 92 : z >= 12 ? 68 : 52;
+      var view = map.getBounds().pad(0.15);
+      var points = groupList.filter(function (g) { return view.contains(g.latlng); })
+        .map(function (g) { return map.latLngToContainerPoint(g.latlng); });
+      var tightest = Infinity;
+      for (var i = 0; i < points.length; i++) {
+        for (var j = i + 1; j < points.length; j++) {
+          tightest = Math.min(tightest, points[i].distanceTo(points[j]));
+        }
+      }
+      pinSize = Math.round(Math.max(48, Math.min(cap, tightest - 12)));
+      map.getContainer().style.setProperty('--pin-size', pinSize + 'px');
+    }
+    map.on('zoomend moveend', resizePins);
+    resizePins();
+
+    // Big preview when the mouse rests on a pin (desktop only)
+    var canHover = window.matchMedia && window.matchMedia('(hover: hover)').matches;
+    var preview = document.createElement('div');
+    preview.className = 'map-preview';
+    preview.innerHTML = '<img alt=""><div class="map-preview-caption"><strong></strong><span></span></div>';
+    map.getContainer().appendChild(preview);
+    var previewImg = preview.querySelector('img');
+    var previewTimer = null;
+    var previewGroup = null;
+
+    function placePreview() {
+      if (!previewGroup) return;
+      var pt = map.latLngToContainerPoint(previewGroup.latlng);
+      var box = map.getContainer().getBoundingClientRect();
+      var w = preview.offsetWidth;
+      var h = preview.offsetHeight;
+      var gap = pinSize / 2 + 12;
+      var left = Math.max(8, Math.min(box.width - w - 8, pt.x - w / 2));
+      var top = pt.y - gap - h;
+      var below = top < 8;
+      if (below) top = Math.min(box.height - h - 8, pt.y + gap);
+      preview.classList.toggle('is-below', below);
+      preview.style.left = left + 'px';
+      preview.style.top = top + 'px';
+    }
+    var PREVIEW_DELAY = 900; // ms the mouse has to rest on a pin
+    var restPoint = null;
+    function schedulePreview(group, e) {
+      if (!canHover || previewGroup === group) return;
+      // restart the countdown whenever the mouse is still moving
+      if (restPoint && e && Math.hypot(e.clientX - restPoint.x, e.clientY - restPoint.y) < 3) return;
+      restPoint = e ? { x: e.clientX, y: e.clientY } : null;
+      clearTimeout(previewTimer);
+      previewTimer = setTimeout(function () {
+        var p = group.photos[0];
+        previewGroup = group;
+        previewImg.onload = placePreview;
+        previewImg.src = p.preview || p.thumb;
+        preview.querySelector('strong').textContent = p.postTitle;
+        var n = group.photos.length;
+        preview.querySelector('span').textContent = n > 1 ? n + ' Fotos' : '';
+        placePreview();
+        preview.classList.add('is-visible');
+      }, PREVIEW_DELAY);
+    }
+    function hidePreview() {
+      clearTimeout(previewTimer);
+      restPoint = null;
+      previewGroup = null;
+      preview.classList.remove('is-visible');
+    }
+    map.on('movestart zoomstart', hidePreview);
+
+    // Pins that overlap on screen: zoom in to spread them out first,
+    // open the photos only once the clicked pin stands on its own (or at max zoom)
+    var OVERLAP_PX = 48;
+    var MAX_ZOOM = 18;
+    function openOrZoom(group) {
+      var here = map.latLngToContainerPoint(group.latlng);
+      var near = Object.keys(groups).map(function (k) { return groups[k]; }).filter(function (g) {
+        return map.latLngToContainerPoint(g.latlng).distanceTo(here) < OVERLAP_PX;
+      });
+      if (near.length > 1 && map.getZoom() < MAX_ZOOM) {
+        var bounds = L.latLngBounds(near.map(function (g) { return g.latlng; }));
+        var zoom = map.getBoundsZoom(bounds, false, L.point(200, 200));
+        zoom = Math.min(MAX_ZOOM, Math.max(zoom, map.getZoom() + 2));
+        map.flyTo(bounds.getCenter(), zoom, { duration: 0.8 });
+        return;
+      }
+      // still stacked at max zoom: show all their photos together
+      var photos = near.length > 1
+        ? near.reduce(function (all, g) { return all.concat(g.photos); }, [])
+        : group.photos;
+      GLightbox({
+        elements: photos.map(function (p) { return { href: p.full, type: 'image' }; })
+      }).open();
+    }
 
     // Fallback pins for posts without any GPS-tagged photos
     postPins.forEach(function (p) {
@@ -61,6 +224,113 @@
       var popup = '<a href="' + p.postURL + '"><strong>' + p.postTitle + '</strong></a>' + (p.location ? '<br>' + p.location : '');
       L.marker([p.lat, p.lon]).addTo(map).bindPopup(popup);
     });
+
+    /* ---------- Cork board: stable "random" tilt, offset and fastener per photo ---------- */
+    function hash(str) {
+      var h = 2166136261;
+      for (var i = 0; i < str.length; i++) {
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return h >>> 0;
+    }
+    var fasteners = ['pin-red', 'pin-blue', 'tape', 'magnet', 'pin-yellow', 'tape-blue'];
+    document.querySelectorAll('.cork-photo').forEach(function (el) {
+      var h = hash(el.getAttribute('data-seed') || '');
+      el.style.setProperty('--tilt', ((h % 15) - 7) + 'deg');
+      el.style.setProperty('--dy', (((h >> 4) % 17) - 8) + 'px');
+      var kind = fasteners[(h >> 8) % fasteners.length];
+      var fastener = document.createElement('span');
+      fastener.className = 'cork-fastener cork-' + kind;
+      fastener.setAttribute('aria-hidden', 'true');
+      el.appendChild(fastener);
+    });
+    document.querySelectorAll('.cork-note').forEach(function (el) {
+      var h = hash(el.textContent);
+      el.style.setProperty('--tilt', ((h % 7) - 3) + 'deg');
+    });
+    if (window.GLightbox) GLightbox({ selector: '.cork-glightbox' });
+
+    /* ---------- Lever: click, tap, drag or keys to switch between map and cork board ---------- */
+    var lever = document.getElementById('view-lever');
+    var ctl = lever.parentElement;
+    var mapEl = document.getElementById('travel-map');
+    var wall = document.getElementById('cork-wall');
+    var MAX_ANGLE = 35;
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Keep the light coming from the top left while the arm turns:
+    // rotate the shadow offset against the arm's own rotation.
+    function setAngle(deg) {
+      var rad = -deg * Math.PI / 180;
+      var sx = 4 * Math.cos(rad) - 4 * Math.sin(rad);
+      var sy = 4 * Math.sin(rad) + 4 * Math.cos(rad);
+      lever.style.setProperty('--lever-angle', deg + 'deg');
+      lever.style.setProperty('--sx', sx.toFixed(2) + 'px');
+      lever.style.setProperty('--sy', sy.toFixed(2) + 'px');
+    }
+
+    function setView(showWall, animate) {
+      var changed = (lever.getAttribute('aria-checked') === 'true') !== showWall;
+      lever.setAttribute('aria-checked', showWall ? 'true' : 'false');
+      ctl.classList.toggle('is-on', showWall);
+      lever.setAttribute('aria-label', showWall ? 'Karte anzeigen' : 'Pinnwand anzeigen');
+      setAngle(showWall ? MAX_ANGLE : -MAX_ANGLE);
+      mapEl.hidden = showWall;
+      wall.hidden = !showWall;
+      if (!showWall) map.invalidateSize();
+      try { localStorage.setItem('map-view', showWall ? 'wall' : 'map'); } catch (e) {}
+      if (animate && changed && !reduceMotion) {
+        var view = showWall ? wall : mapEl;
+        view.classList.remove('lever-clack');
+        void view.offsetWidth;
+        view.classList.add('lever-clack');
+      }
+    }
+    function isOn() { return lever.getAttribute('aria-checked') === 'true'; }
+
+    // Drag: follow the pointer around the hub, snap to the nearer side on release
+    var drag = null;
+    lever.addEventListener('pointerdown', function (e) {
+      if (e.button !== 0) return;
+      var hub = lever.querySelector('.lever-hub').getBoundingClientRect();
+      drag = { x: e.clientX, y: e.clientY, cx: hub.left + hub.width / 2, cy: hub.top + hub.height / 2, moved: false, angle: 0 };
+      lever.setPointerCapture(e.pointerId);
+    });
+    lever.addEventListener('pointermove', function (e) {
+      if (!drag) return;
+      if (!drag.moved && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 4) return;
+      drag.moved = true;
+      lever.classList.add('is-dragging');
+      var deg = Math.atan2(e.clientX - drag.cx, drag.cy - e.clientY) * 180 / Math.PI;
+      drag.angle = Math.max(-MAX_ANGLE, Math.min(MAX_ANGLE, deg));
+      setAngle(drag.angle);
+    });
+    function endDrag(e, cancelled) {
+      if (!drag) return;
+      var d = drag;
+      drag = null;
+      lever.classList.remove('is-dragging');
+      if (cancelled) { setView(isOn(), false); return; }
+      setView(d.moved ? d.angle > 0 : !isOn(), true);
+    }
+    lever.addEventListener('pointerup', function (e) { endDrag(e, false); });
+    lever.addEventListener('pointercancel', function (e) { endDrag(e, true); });
+    // Keyboard activation (Enter / Space) arrives as a click without a pointer
+    lever.addEventListener('click', function (e) {
+      if (e.detail === 0) setView(!isOn(), true);
+    });
+    lever.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); setView(false, true); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); setView(true, true); }
+    });
+
+    var saved = null;
+    try { saved = localStorage.getItem('map-view'); } catch (e) {}
+    setView(location.hash === '#pinnwand' || saved === 'wall', false);
+    // apply the restored position before enabling animations
+    void lever.offsetWidth;
+    requestAnimationFrame(function () { ctl.classList.add('is-ready'); });
   })();
   </script>
 </article>

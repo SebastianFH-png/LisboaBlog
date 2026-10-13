@@ -7,12 +7,14 @@
   {{ range $post.Resources.ByType "image" }}
     {{ $exif := .Exif }}
     {{ if and $exif (ne $exif.Lat 0.0) (ne $exif.Long 0.0) }}
-      {{ $thumb := .Fill "160x160 webp q70 Center" }}
+      {{ $thumb := .Fill "240x240 webp q70 Center" }}
+      {{ $preview := .Resize "560x webp q75" }}
       {{ $full := .Resize "1600x webp q80" }}
       {{ $photoPins = $photoPins | append (dict
         "lat" $exif.Lat
         "lon" $exif.Long
         "thumb" $thumb.RelPermalink
+        "preview" $preview.RelPermalink
         "full" $full.RelPermalink
         "postURL" $post.RelPermalink
         "postTitle" $post.Title
