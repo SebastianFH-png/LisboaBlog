@@ -28,6 +28,17 @@ body.h-screen {
   backdrop-filter: saturate(1.4) blur(14px);
   -webkit-backdrop-filter: saturate(1.4) blur(14px);
   transition: box-shadow 0.2s ease;
+  /* with viewport-fit=cover the header sits behind the notch: pad its content below it */
+  padding-top: calc(0.75rem + env(safe-area-inset-top, 0px));
+}
+@media (min-width: 640px) {
+  .site-header-sticky {
+    padding-top: calc(1.25rem + env(safe-area-inset-top, 0px));
+  }
+}
+/* scroll progress bar right below the notch instead of hidden behind it */
+#scroll-progress {
+  top: env(safe-area-inset-top, 0px);
 }
 .dark .site-header-sticky {
   background-color: rgba(var(--color-neutral-800), 0.92);
@@ -50,12 +61,20 @@ article h1 {
   letter-spacing: -0.02em;
 }
 
-/* Home hero: fills the whole screen below the sticky header on first view.
-   svh = the viewport with the mobile browser bars shown, so nothing is cut off on iPhone. */
+/* Home hero: fills the whole screen, reaching up behind the header and the notch.
+   lvh = the viewport with the mobile browser bars collapsed, so the photo still covers the
+   screen once Safari hides its bars instead of leaving a white strip at the bottom. */
 .hero-fill {
   min-height: max(22rem, 100vh);
-  min-height: max(22rem, 100svh);
+  min-height: max(22rem, 100lvh);
   padding-top: calc(var(--header-h, 4rem) + 3rem);
+  /* keep title and arrow centered in the part not covered by Safari's bottom bar */
+  padding-bottom: calc(5rem + 100lvh - 100svh);
+}
+@media (min-width: 640px) {
+  .hero-fill {
+    padding-bottom: calc(6rem + 100lvh - 100svh);
+  }
 }
 /* the hero reaches up behind the (transparent) header */
 #hero {
@@ -997,6 +1016,23 @@ html:has(#hero) .site-header-sticky {
 @media (min-width: 640px) {
   .azulejo-band {
     padding: 9rem 0 10rem;
+  }
+}
+/* Phones and tablets: the band fills the screen below the header, so the statement + stats
+   stop is a full page of tiles (the magnetic scroll parks it right under the header) */
+@media (pointer: coarse) {
+  .azulejo-band {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: calc(100vh - var(--header-h, 4rem));
+    min-height: calc(100lvh - var(--header-h, 4rem));
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+  /* auto side margins in a flex column would shrink the stats grid to its content */
+  .azulejo-band > * {
+    width: 100%;
   }
 }
 

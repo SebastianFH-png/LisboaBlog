@@ -309,9 +309,18 @@
       var headerH = headerEl ? headerEl.offsetHeight : 0;
       var top = storyEl.getBoundingClientRect().top + y;
       var bottom = statsEl.getBoundingClientRect().bottom + y;
-      var middle = bottom - top <= vh - headerH - 32
-        ? (top + bottom) / 2 - (vh + headerH) / 2  // center the block in the area below the header
-        : top - headerH - 16;
+      var band = document.getElementById("tiles");
+      var bandRect = band ? band.getBoundingClientRect() : null;
+      var middle;
+      if (bandRect && bandRect.height >= vh - headerH - 2) {
+        // touch devices: the tile band fills the screen, center the whole band below the header
+        // (with Safari's bars collapsed it lines up exactly under the header, no hero peeking in)
+        middle = bandRect.top + y + bandRect.height / 2 - (vh + headerH) / 2;
+      } else {
+        middle = bottom - top <= vh - headerH - 32
+          ? (top + bottom) / 2 - (vh + headerH) / 2  // center the block in the area below the header
+          : top - headerH - 16;
+      }
       var latest = latestEl.getBoundingClientRect().top + y - headerH - 24;
       return [0, Math.max(0, Math.round(middle)), Math.round(latest)];
     }
