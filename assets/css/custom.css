@@ -8,6 +8,14 @@ html.dark {
   background-color: rgb(var(--color-neutral-800));
 }
 
+/* The theme makes <body> exactly one screen tall (h-screen). A sticky header can only stick inside
+   its parent, so it slid away after one screen of scrolling. Let the body grow with its content. */
+body.h-screen {
+  height: auto;
+  min-height: 100vh;
+  min-height: 100svh;
+}
+
 /* Full-bleed sticky header with its own background (not a pseudo element), so iOS Safari
    detects it and tints the status bar area to match instead of leaving a gap above it. */
 .site-header-sticky {
@@ -42,8 +50,33 @@ article h1 {
   letter-spacing: -0.02em;
 }
 
-.hero-banner {
-  min-height: 22rem;
+/* Home hero: fills the whole screen below the sticky header on first view.
+   svh = the viewport with the mobile browser bars shown, so nothing is cut off on iPhone. */
+.hero-fill {
+  min-height: max(22rem, 100vh);
+  min-height: max(22rem, 100svh);
+  padding-top: calc(var(--header-h, 4rem) + 3rem);
+}
+/* the hero reaches up behind the (transparent) header */
+#hero {
+  margin-top: calc(-1 * var(--header-h, 4rem));
+}
+
+/* Home: header starts transparent over the hero photo, turns solid once scrolled past it */
+html:has(#hero) .site-header-sticky:not(.is-solid) {
+  background-color: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  color: rgb(var(--color-neutral-50));
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
+}
+html:has(#hero) .site-header-sticky:not(.is-solid) a,
+html:has(#hero) .site-header-sticky:not(.is-solid) button {
+  color: inherit;
+}
+html:has(#hero) .site-header-sticky {
+  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease;
 }
 .hero-text-shadow {
   text-shadow: 0 2px 24px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.85);
@@ -108,8 +141,17 @@ article h1 {
   border: 2px solid white;
 }
 
-#scroll-progress {
-  transition: transform 0.1s linear;
+/* Scroll progress bar: driven by the browser's own scroll timeline where supported
+   (smooth on iOS, no JS); otherwise the home page script sets the transform */
+@supports (animation-timeline: scroll()) {
+  #scroll-progress {
+    animation: scroll-progress linear both;
+    animation-timeline: scroll(root block);
+  }
+  @keyframes scroll-progress {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
 }
 
 #hero-parallax {
@@ -252,7 +294,7 @@ article h1 {
 }
 /* azulejo blue dotted variant */
 .washi-tr,
-.polaroid:nth-child(3n) .washi {
+.washi-blue {
   background:
     radial-gradient(circle, rgba(var(--color-neutral), 0.9) 2px, transparent 2.5px) 0 0 / 12px 12px,
     rgba(var(--color-secondary-400), 0.72);
@@ -269,10 +311,10 @@ article h1 {
 }
 .washi-top {
   top: -0.9rem;
-  left: 50%;
+  left: var(--fx, 50%);
   translate: -50% 0;
   width: 5.5rem;
-  rotate: -3deg;
+  rotate: var(--fa, -3deg);
 }
 
 /* Round postmark stamp */
@@ -350,14 +392,8 @@ article h1 {
   box-shadow:
     0 1px 2px rgba(var(--color-neutral-900), 0.12),
     0 10px 24px -12px rgba(var(--color-neutral-900), 0.4);
-  rotate: -1.2deg;
+  rotate: var(--tilt, -1.2deg);
   transition: rotate 0.3s ease, scale 0.3s ease;
-}
-.polaroid:nth-child(even) {
-  rotate: 1.4deg;
-}
-.polaroid:nth-child(3n) {
-  rotate: -0.4deg;
 }
 .polaroid:hover {
   scale: 1.03;
@@ -382,11 +418,12 @@ article h1 {
   position: absolute;
   z-index: 3;
   top: -1.4rem;
-  left: 1.4rem;
+  left: var(--fx, 20%);
+  translate: -50% 0;
   width: 1.2rem;
   height: 3.4rem;
   color: rgb(var(--color-neutral-400));
-  rotate: -8deg;
+  rotate: calc(var(--fa, 0deg) - 6deg);
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25));
   pointer-events: none;
 }
@@ -928,4 +965,70 @@ article h1 {
 .dark .slideshow-arrow {
   color: rgb(var(--color-neutral-200));
   background: rgba(var(--color-neutral-800), 0.7);
+}
+
+/* Home: band of Lisbon azulejo tiles behind the statement and the stats, fading out top and bottom */
+.azulejo-band {
+  position: relative;
+  isolation: isolate;
+  padding: 7rem 0 7.5rem;
+  margin-bottom: 5rem;
+}
+.azulejo-band::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%23f6f9fb'/%3E%3Crect x='.5' y='.5' width='79' height='79' fill='none' stroke='%23dbe7ee'/%3E%3Cg fill='%235aa3c4' opacity='.55'%3E%3Ccircle r='9'/%3E%3Ccircle cx='80' r='9'/%3E%3Ccircle cy='80' r='9'/%3E%3Ccircle cx='80' cy='80' r='9'/%3E%3C/g%3E%3Cg fill='none' stroke='%231f6f95' stroke-width='2'%3E%3Ccircle r='20'/%3E%3Ccircle cx='80' r='20'/%3E%3Ccircle cy='80' r='20'/%3E%3Ccircle cx='80' cy='80' r='20'/%3E%3Cpath d='M40 9 71 40 40 71 9 40Z'/%3E%3C/g%3E%3Cg fill='%231f6f95'%3E%3Cpath d='M40 20c5 7 5 13 0 20c-5-7-5-13 0-20z' transform='rotate%280 40 40%29'/%3E%3Cpath d='M40 20c5 7 5 13 0 20c-5-7-5-13 0-20z' transform='rotate%2890 40 40%29'/%3E%3Cpath d='M40 20c5 7 5 13 0 20c-5-7-5-13 0-20z' transform='rotate%28180 40 40%29'/%3E%3Cpath d='M40 20c5 7 5 13 0 20c-5-7-5-13 0-20z' transform='rotate%28270 40 40%29'/%3E%3C/g%3E%3Cg fill='%235aa3c4'%3E%3Cpath d='M40 27c3 4 3 8 0 13c-3-5-3-9 0-13z' transform='rotate%2845 40 40%29'/%3E%3Cpath d='M40 27c3 4 3 8 0 13c-3-5-3-9 0-13z' transform='rotate%28135 40 40%29'/%3E%3Cpath d='M40 27c3 4 3 8 0 13c-3-5-3-9 0-13z' transform='rotate%28225 40 40%29'/%3E%3Cpath d='M40 27c3 4 3 8 0 13c-3-5-3-9 0-13z' transform='rotate%28315 40 40%29'/%3E%3C/g%3E%3Ccircle cx='40' cy='40' r='4' fill='%23f6f9fb' stroke='%231f6f95' stroke-width='2'/%3E%3C/svg%3E") center / 84px 84px;
+  opacity: 0.38;
+  -webkit-mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent);
+  mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent);
+}
+.dark .azulejo-band::before {
+  opacity: 0.1;
+}
+/* soft glow behind the big statement so it stays readable on the tiles */
+.azulejo-band #story p {
+  text-shadow: 0 0 24px rgb(var(--color-neutral)), 0 0 48px rgb(var(--color-neutral));
+}
+.dark .azulejo-band #story p {
+  text-shadow: 0 0 24px rgb(var(--color-neutral-800)), 0 0 48px rgb(var(--color-neutral-800));
+}
+@media (min-width: 640px) {
+  .azulejo-band {
+    padding: 9rem 0 10rem;
+  }
+}
+
+/* ---------- Page transitions (View Transitions API; browsers without it just navigate) ---------- */
+@view-transition {
+  navigation: auto;
+}
+/* the header stays in place, only the page content moves */
+#site-header {
+  view-transition-name: site-header;
+}
+::view-transition-group(site-header) {
+  z-index: 10;
+}
+html:active-view-transition-type(slide-forward)::view-transition-old(root) {
+  animation: page-out-left 0.5s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+html:active-view-transition-type(slide-forward)::view-transition-new(root) {
+  animation: page-in-right 0.5s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+html:active-view-transition-type(slide-back)::view-transition-old(root) {
+  animation: page-out-right 0.5s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+html:active-view-transition-type(slide-back)::view-transition-new(root) {
+  animation: page-in-left 0.5s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+@keyframes page-out-left { to { transform: translateX(-100%); } }
+@keyframes page-in-right { from { transform: translateX(100%); } }
+@keyframes page-out-right { to { transform: translateX(100%); } }
+@keyframes page-in-left { from { transform: translateX(-100%); } }
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
 }

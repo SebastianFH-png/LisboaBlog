@@ -22,9 +22,32 @@
 (function () {
   var header = document.getElementById("site-header");
   if (header) {
-    window.addEventListener("scroll", function () {
+    // lets the home hero fill exactly the screen below the header
+    var setHeaderHeight = function () {
+      document.documentElement.style.setProperty("--header-h", header.offsetHeight + "px");
+    };
+    setHeaderHeight();
+    window.addEventListener("resize", setHeaderHeight, { passive: true });
+    // Home: solid header (and matching browser bar color) only once the hero photo is scrolled past
+    var hero = document.getElementById("hero");
+    var themeMeta = document.querySelector("meta[name=theme-color]");
+    var solidThemeColor = themeMeta && themeMeta.getAttribute("content");
+    var updateHeader = function () {
       header.classList.toggle("is-scrolled", window.scrollY > 8);
-    }, { passive: true });
+      if (!hero) return;
+      // transparent only while the hero photo is the main view (solid from the stats on)
+      var solid = window.scrollY > hero.offsetHeight * 0.25;
+      if (solid === header.classList.contains("is-solid")) return;
+      header.classList.toggle("is-solid", solid);
+      if (themeMeta) {
+        if (solid) themeMeta.setAttribute("content", solidThemeColor);
+        else { solidThemeColor = themeMeta.getAttribute("content"); themeMeta.setAttribute("content", "#1f1a16"); }
+      }
+    };
+    window.addEventListener("scroll", updateHeader, { passive: true });
+    window.addEventListener("resize", updateHeader, { passive: true });
+    if (hero && themeMeta) themeMeta.setAttribute("content", "#1f1a16");
+    updateHeader();
   }
 
   var targets = Array.prototype.filter.call(

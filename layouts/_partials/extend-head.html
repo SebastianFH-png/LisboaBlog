@@ -1,0 +1,27 @@
+<script>
+/* Page transitions: Start -> Beiträge -> Karte slide like pages side by side.
+   Going right in that order slides the new page in from the right, going back from the left.
+   Runs in the head so the listener exists before the new page is first shown. */
+(function () {
+  var base = {{ "" | relURL }};
+  function pageIndex(url) {
+    var path = new URL(url, location.href).pathname;
+    if (path.indexOf(base) === 0) path = path.slice(base.length);
+    if (path.indexOf("map") === 0) return 2;
+    if (path.indexOf("posts") === 0) return 1;
+    if (path === "" || path === "index.html") return 0;
+    return null;
+  }
+  window.addEventListener("pagereveal", function (e) {
+    if (!e.viewTransition) return;
+    var from = null;
+    try { from = sessionStorage.getItem("page-index"); } catch (err) {}
+    var to = pageIndex(location.href);
+    if (from === null || from === "null" || to === null || Number(from) === to) return;
+    e.viewTransition.types.add(to > Number(from) ? "slide-forward" : "slide-back");
+  });
+  window.addEventListener("pagehide", function () {
+    try { sessionStorage.setItem("page-index", String(pageIndex(location.href))); } catch (err) {}
+  });
+})();
+</script>
