@@ -44,12 +44,20 @@ jobs:
         run: npm ci
       - name: Build Tailwind CSS
         run: npm run build:css
+      - name: Restore processed images
+        # resized photos are slow to generate; reuse the previous run's, Hugo makes only new ones
+        uses: actions/cache@v4
+        with:
+          path: resources/_gen
+          key: hugo-resources-${{ github.run_id }}
+          restore-keys: hugo-resources-
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
       - name: Build with Hugo
         run: |
           hugo \
+            --gc \
             --minify \
             --baseURL "${{ steps.pages.outputs.base_url }}/"
       - name: Upload artifact
