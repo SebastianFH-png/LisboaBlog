@@ -5,7 +5,7 @@
 colorScheme = "lisboa"
 defaultAppearance = "light" # valid options: light or dark
 autoSwitchAppearance = false
-defaultThemeColor = "#1f809e"
+defaultThemeColor = "#fffdfa" # must match header bg, iOS Safari paints the status bar area with it
 
 enableSearch = true
 enableCodeCopy = true

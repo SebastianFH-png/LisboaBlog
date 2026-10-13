@@ -1,18 +1,18 @@
-<header id="site-header" class="site-header-sticky py-4 font-semibold text-neutral-900 dark:text-neutral sm:py-6 print:hidden">
-  <nav class="flex items-start justify-between sm:items-center">
+<header id="site-header" class="site-header-sticky py-3 font-semibold text-neutral-900 dark:text-neutral sm:py-5 print:hidden">
+  <nav class="flex items-center justify-between gap-3">
     {{/* Site logo/title */}}
-    <div class="flex flex-row items-center">
+    <div class="flex min-w-0 flex-row items-center text-base sm:text-lg">
       {{ partial "logo.html" . }}
     </div>
     {{/* Main menu */}}
     {{ if or .Site.Menus.main (.Site.Params.enableSearch | default false) }}
-      <ul class="flex list-none flex-col text-end sm:flex-row">
+      <ul class="flex shrink-0 list-none flex-row items-center gap-4 text-[0.9375rem] sm:gap-7 sm:text-lg">
         {{ if .Site.Menus.main }}
           {{ range .Site.Menus.main }}
             {{ if and (eq .Params.action "locale") (or (not page.IsTranslated) (not hugo.IsMultilingual)) }}
               {{ continue }}
             {{ end }}
-            <li class="group mb-1 sm:mb-0 sm:me-7 sm:last:me-0.5">
+            <li class="group{{ if eq .PageRef "/" }} hidden sm:list-item{{ end }}">
               {{ if eq .Params.action "search" }}
                 {{ $.Scratch.Add "searchCount" 1 }}
                 {{ if $.Site.Params.enableSearch | default false }}
@@ -96,7 +96,7 @@
             </li>
           {{ end }}
           {{ if and ($.Site.Params.enableSearch | default false) (eq ($.Scratch.Get "searchCount") 0) }}
-            <li class="group mb-1 sm:mb-0 sm:me-7 sm:last:me-0">
+            <li class="group">
               <button id="search-button-m0" title="{{ i18n "search.open_button_title" }}">
                 <span
                   class="group-dark:hover:text-primary-400 transition-colors group-hover:text-primary-600"

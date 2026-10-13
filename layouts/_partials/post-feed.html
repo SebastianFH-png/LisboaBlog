@@ -5,7 +5,7 @@
     <button
       type="button"
       id="jump-to-oldest"
-      class="inline-flex items-center gap-1.5 rounded-full border-2 border-primary-200 bg-neutral px-4 py-2 text-sm font-semibold text-neutral-700 shadow-sm transition hover:border-primary-400 hover:text-primary-600 dark:border-primary-800 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:text-primary-400"
+      class="inline-flex items-center gap-1.5 rounded-full border border-primary-200 bg-neutral px-4 py-2 text-sm font-semibold text-neutral-700 shadow-sm transition hover:border-primary-400 hover:text-primary-600 dark:border-primary-800 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:text-primary-400"
     >
       Zum ältesten Beitrag
       {{ partial "icon.html" "chevron-down" }}
@@ -15,8 +15,8 @@
 
 <div class="flex flex-col gap-16">
   {{ range $i, $post := $posts }}
-    <article {{ if eq $i (sub (len $posts) 1) }}id="oldest-post"{{ end }} class="fade-in-up overflow-hidden rounded-2xl border-2 border-primary-200 bg-neutral shadow-md dark:border-primary-800 dark:bg-neutral-800/60">
-      <div class="border-b-2 border-primary-100 bg-primary-50 px-6 py-6 dark:border-primary-900 dark:bg-primary-900/40 sm:px-10">
+    <article {{ if eq $i (sub (len $posts) 1) }}id="oldest-post"{{ end }} class="fade-in-up overflow-hidden rounded-3xl border border-neutral-200 bg-neutral shadow-card dark:border-neutral-700 dark:bg-neutral-800/60">
+      <div class="border-b border-primary-100 bg-primary-50/70 px-5 py-5 dark:border-primary-900/60 dark:bg-primary-900/30 sm:px-10 sm:py-6">
         <h2 class="m-0 text-2xl font-extrabold sm:text-3xl">
           <a class="text-neutral-900 hover:text-primary-600 dark:text-neutral dark:hover:text-primary-400" href="{{ $post.RelPermalink }}">
             {{ $post.Title | emojify }}
@@ -26,7 +26,7 @@
           {{ partial "article-meta.html" (dict "context" $post "scope" "list") }}
         </div>
       </div>
-      <div class="prose max-w-none px-6 py-8 dark:prose-invert sm:px-10">
+      <div class="prose max-w-none px-5 py-7 dark:prose-invert sm:px-10 sm:py-8">
         {{ $post.Content | emojify }}
       </div>
     </article>

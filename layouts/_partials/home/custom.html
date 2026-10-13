@@ -32,15 +32,15 @@
 <div id="scroll-progress" class="fixed inset-x-0 top-0 z-50 h-1 origin-left scale-x-0 bg-primary-500"></div>
 
 {{/* ---------- Hero ---------- */}}
-<header id="hero" class="hero-banner relative -mt-6 mb-4 overflow-hidden text-center text-neutral-50 sm:-mt-10">
+<header id="hero" class="hero-banner full-bleed relative mb-4 overflow-hidden text-center text-neutral-50">
   {{ with $hero }}
     <div id="hero-parallax" class="absolute -inset-6">
       <img src="{{ .RelPermalink }}" alt="" class="hero-banner-img h-full w-full object-cover" loading="eager">
     </div>
   {{ end }}
   <div class="absolute inset-0 bg-gradient-to-b from-neutral-900/70 via-neutral-900/55 to-neutral-900/75"></div>
-  <div class="relative flex min-h-[92vh] flex-col items-center justify-center px-8 py-24">
-    <h1 id="hero-title" class="hero-text-shadow cursor-pointer select-none text-6xl font-extrabold uppercase leading-[0.95] tracking-tight sm:text-8xl md:text-9xl" title="Klick mich ein paar Mal ;)">
+  <div class="relative flex min-h-[85vh] min-h-[85svh] flex-col items-center justify-center px-6 py-20 sm:py-24">
+    <h1 id="hero-title" class="hero-text-shadow cursor-pointer select-none text-5xl font-extrabold uppercase leading-[0.95] tracking-tight min-[400px]:text-6xl sm:text-8xl md:text-9xl" title="Klick mich ein paar Mal ;)">
       {{ site.Title | emojify }}
     </h1>
     {{ with site.Params.author.headline }}
@@ -67,7 +67,7 @@
     (dict "value" $photoCount "label" "Fotos")
   }}
   {{ range $i, $s := $stats }}
-  <div class="reveal-pop tilt-card rounded-2xl border-2 border-primary-100 bg-neutral px-3 py-8 text-center shadow-sm transition-shadow hover:shadow-lg dark:border-primary-900 dark:bg-neutral-800/60" style="transition-delay: {{ mul $i 80 }}ms">
+  <div class="reveal-pop tilt-card rounded-2xl border border-neutral-200 bg-neutral px-3 py-6 sm:py-8 text-center shadow-sm transition-shadow hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-800/60" style="transition-delay: {{ mul $i 80 }}ms">
     <div class="stat-number text-4xl font-extrabold text-primary-600 dark:text-primary-400 sm:text-5xl" data-target="{{ $s.value }}">0</div>
     <div class="mt-1 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400 sm:text-sm">{{ $s.label }}</div>
   </div>
@@ -80,8 +80,8 @@
   <div class="mb-6 text-center">
     <span class="text-xs font-semibold uppercase tracking-widest text-primary-500">Neuester Beitrag</span>
   </div>
-  <article class="tilt-card overflow-hidden rounded-2xl border-2 border-primary-200 bg-neutral shadow-md transition-shadow hover:shadow-xl dark:border-primary-800 dark:bg-neutral-800/60">
-    <div class="border-b-2 border-primary-100 bg-primary-50 px-6 py-6 dark:border-primary-900 dark:bg-primary-900/40 sm:px-10">
+  <article class="tilt-card overflow-hidden rounded-3xl border border-neutral-200 bg-neutral shadow-card transition-shadow hover:shadow-xl dark:border-neutral-700 dark:bg-neutral-800/60">
+    <div class="border-b border-primary-100 bg-primary-50/70 px-5 py-5 dark:border-primary-900/60 dark:bg-primary-900/30 sm:px-10 sm:py-6">
       <h2 class="m-0 text-2xl font-extrabold sm:text-3xl">
         <a class="text-neutral-900 hover:text-primary-600 dark:text-neutral dark:hover:text-primary-400" href="{{ .RelPermalink }}">
           {{ .Title | emojify }}
@@ -91,7 +91,7 @@
         {{ partial "article-meta.html" (dict "context" . "scope" "list") }}
       </div>
     </div>
-    <div class="prose max-w-none px-6 py-8 dark:prose-invert sm:px-10">
+    <div class="prose max-w-none px-5 py-7 dark:prose-invert sm:px-10 sm:py-8">
       {{ .Content | emojify }}
     </div>
   </article>
@@ -110,7 +110,7 @@
     <h2 class="text-2xl font-extrabold sm:text-3xl">Wo ich schon war</h2>
     <p class="mt-1 text-neutral-500 dark:text-neutral-400">{{ $placeCount }} Orte, direkt aus den GPS-Daten der Fotos.</p>
   </div>
-  <a href="{{ "map" | relURL }}" class="tilt-card group relative block h-64 overflow-hidden rounded-2xl border-2 border-primary-200 shadow-md transition-shadow hover:shadow-xl dark:border-primary-800 sm:h-80">
+  <a href="{{ "map" | relURL }}" class="tilt-card group relative block h-64 overflow-hidden rounded-3xl border border-neutral-200 shadow-card transition-shadow hover:shadow-xl dark:border-neutral-700 sm:h-80">
     <div id="mini-map" class="pointer-events-none h-full w-full transition-transform duration-500 group-hover:scale-105"></div>
     <div class="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-neutral-900/70 via-transparent to-transparent p-6">
       <span class="inline-flex items-center gap-1.5 rounded-full bg-neutral px-4 py-2 text-sm font-semibold text-neutral-800 shadow-sm transition group-hover:bg-primary-50">

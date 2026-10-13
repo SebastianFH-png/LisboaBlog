@@ -1,25 +1,31 @@
 /* Apple-style touches: big type, generous spacing, sticky blurred nav, scroll fade-ins */
 
+html {
+  background-color: rgb(var(--color-neutral));
+  overflow-x: clip;
+}
+html.dark {
+  background-color: rgb(var(--color-neutral-800));
+}
+
+/* Full-bleed sticky header with its own background (not a pseudo element), so iOS Safari
+   detects it and tints the status bar area to match instead of leaving a gap above it. */
 .site-header-sticky {
   position: sticky;
   top: 0;
   z-index: 40;
+  margin-inline: calc(50% - 50vw);
+  padding-inline: calc(50vw - 50%);
+  background-color: rgba(var(--color-neutral), 0.92);
+  backdrop-filter: saturate(1.4) blur(14px);
+  -webkit-backdrop-filter: saturate(1.4) blur(14px);
   transition: box-shadow 0.2s ease;
 }
-.site-header-sticky::before {
-  content: "";
-  position: absolute;
-  inset: 0 calc(50% - 50vw);
-  z-index: -1;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  background-color: rgba(var(--color-neutral), 0.8);
-}
-.dark .site-header-sticky::before {
-  background-color: rgba(var(--color-neutral-800), 0.8);
+.dark .site-header-sticky {
+  background-color: rgba(var(--color-neutral-800), 0.92);
 }
 .site-header-sticky.is-scrolled {
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 0 rgba(var(--color-neutral-900), 0.08);
 }
 
 .fade-in-up {
@@ -162,4 +168,13 @@ article h1 {
     transform: none;
     transition: none;
   }
+}
+
+/* Edge-to-edge section that escapes the body's side padding and max width */
+.full-bleed {
+  margin-inline: calc(50% - 50vw);
+}
+
+.shadow-card {
+  box-shadow: 0 1px 2px rgba(var(--color-neutral-900), 0.04), 0 12px 32px -16px rgba(var(--color-neutral-900), 0.18);
 }
