@@ -26,3 +26,7 @@ summaryLength = 0
 [services]
   [services.x]
     disableInlineCSS = true
+
+# Image.Meta drops GPS by default; keep it for the map pins (gps-pins.html)
+[imaging.meta]
+  fields = ['! *{Exif,Exposure[MPB],Contrast,Resolution,Sharp,JPEG,Metering,Sensing,Saturation,ColorSpace,Flash,WhiteBalance}*']
