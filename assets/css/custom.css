@@ -241,6 +241,16 @@ html:has(#hero) .site-header-sticky {
   }
 }
 
+/* Post slideshows break out of the narrow text column to the full article width
+   (skipped when a TOC sidebar sits next to the content) */
+article > section.prose {
+  container-type: inline-size;
+}
+
+article > section.prose:not(:has(.toc)) .slideshow-wide {
+  width: 100cqw;
+}
+
 /* Edge-to-edge section that escapes the body's side padding and max width */
 .full-bleed {
   margin-inline: calc(50% - 50vw);

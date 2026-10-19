@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.3.1/css/glightbox.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/glightbox/3.3.1/js/glightbox.min.js"></script>
 
-<div id="{{ $id }}" class="not-prose relative my-8">
+<div id="{{ $id }}" class="slideshow-wide not-prose relative my-8">
   <div class="slideshow-track flex h-[21.5rem] snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-2 pb-4 pt-10 sm:h-[29.5rem]">
     {{/* stable "random" per photo: fastener type, its position/angle and the frame's tilt */}}
     {{ $hex := dict "0" 0 "1" 1 "2" 2 "3" 3 "4" 4 "5" 5 "6" 6 "7" 7 "8" 8 "9" 9 "a" 10 "b" 11 "c" 12 "d" 13 "e" 14 "f" 15 }}
