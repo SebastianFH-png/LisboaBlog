@@ -52,7 +52,8 @@ if [ -d "_inbox" ]; then
           ;;
       esac
 
-      rm "$f"
+      chmod u+w "$dest"
+      rm -f "$f"
       n=$((n + 1))
     done
 
