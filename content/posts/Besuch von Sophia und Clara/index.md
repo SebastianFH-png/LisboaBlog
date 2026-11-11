@@ -9,6 +9,6 @@ lon: 0.0
 location: ""
 ---
 
-Über das vergangene Wochenende waren meine Schwester Sophia und ihre Freundin Clara zu Besuch. Wir hatten zwar nicht ganz Glück mit dem Wetter, haben aber trotzdem das Beste daraus gemacht und einige sehr schöne Tage miteinander verbracht. Ein Ausflug nach Cascais ans Meer, der gemeinsame Ausflug in die LX Factory, der Vorort Belem und eine Fährenüberfahrt zur Christus Statue auf der anderen Seite des Flusses waren einige Punkte auf unserem Programm. Aber auch portugiesisches Essen und besonders zahlreiche Pasteis de Nata sowie ein Einblick in das studentische Nachtleben von Lissabon durften natürlich nicht fehlen.
+Über das vergangene Wochenende waren meine Schwester Sophia und ihre Freundin Clara zu Besuch. Wir hatten zwar nicht ganz Glück mit dem Wetter, haben aber trotzdem das Beste daraus gemacht und einige sehr schöne Tage miteinander verbracht. Ein Ausflug nach Cascais ans Meer, das Künstlerviertel LX Factory, der Vorort Belem und eine Fährenüberfahrt zur Christus Statue auf der anderen Seite des Flusses waren einige Punkte auf unserem Programm. Aber auch portugiesisches Essen und besonders zahlreiche Pasteis de Nata sowie ein Einblick in das studentische Nachtleben von Lissabon durften natürlich nicht fehlen.
 
 {{< slideshow >}}
