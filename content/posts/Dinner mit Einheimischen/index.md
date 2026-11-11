@@ -9,6 +9,6 @@ lon: 0.0
 location: ""
 ---
 
-Besonders gefreut habe ich mich über eine Einladung zum Abendessen von einigen portugiesischen Mitstudierenden. Als Erasmus Student ist man oft sehr viel mit Studierenden unterwegs, die ebenfalls ein Auslandssemester machen, daher war es umso cooler auch mal mit Einheimischen außerhalb der Uni was zu unternehmen und zum gemeinsamen Abendessen eingeladen zu werden.
+Besonders gefreut habe ich mich über eine Einladung von einigen portugiesischen Mitstudierenden. Als Erasmus Student ist man oft sehr viel mit Studierenden unterwegs, die ebenfalls ein Auslandssemester machen, daher war es umso cooler, auch mal mit Einheimischen außerhalb der Uni was zu unternehmen und zum gemeinsamen Abendessen eingeladen zu werden.
 
 {{< slideshow >}}

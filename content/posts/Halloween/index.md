@@ -9,6 +9,6 @@ lon: 0.0
 location: ""
 ---
 
-Halloween habe ich im nahegelegenen Studentenwohnheim verbracht, in dem einige der Österreicher untergebracht sind. Dort wurde eine Halloween veranstaltet, und wir haben den Abend mit vielen Bieren, Flunkyball und ganz vielen netten Leuten verbracht. Einige lustige Kostüme waren auch dabei!
+Halloween habe ich im nahegelegenen Studentenwohnheim verbracht, wo einige meiner Freunde von hier wohnen. Dort wurde eine Halloween Party veranstaltet, und wir haben den Abend mit vielen Bieren, Flunkyball und ganz vielen netten Leuten verbracht. Einige lustige Kostüme waren auch dabei!
 
 {{< slideshow >}}
