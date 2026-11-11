@@ -10,6 +10,26 @@ git pull --rebase --autostash
 
 CHANGED_SLUGS=()
 
+# Hugo ignoriert das EXIF-Orientation-Tag, daher Pixel tatsächlich drehen
+auto_orient() {
+  local img="$1" orient rot=""
+  orient="$(exiftool -s3 -n -Orientation "$img" 2>/dev/null || true)"
+  case "$orient" in
+    ""|1) return 0 ;;
+    3) rot=180 ;;
+    6) rot=90 ;;
+    8) rot=270 ;;
+  esac
+  echo "      drehe (EXIF-Orientation $orient)"
+  if [ -n "$rot" ] && jpegtran -copy all -perfect -rotate "$rot" -outfile "$img.tmp" "$img" 2>/dev/null; then
+    mv "$img.tmp" "$img"
+  else
+    rm -f "$img.tmp"
+    magick "$img" -auto-orient "$img"
+  fi
+  exiftool -q -overwrite_original -n -Orientation=1 "$img"
+}
+
 if [ -d "_inbox" ]; then
   for inbox_dir in _inbox/*/; do
     slug="$(basename "$inbox_dir")"
@@ -53,6 +73,7 @@ if [ -d "_inbox" ]; then
       esac
 
       chmod u+w "$dest"
+      [ "${dest##*.}" = "jpg" ] && auto_orient "$dest"
       rm -f "$f"
       n=$((n + 1))
     done
